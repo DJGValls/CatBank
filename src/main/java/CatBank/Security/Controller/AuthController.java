@@ -1,9 +1,6 @@
 package CatBank.Security.Controller;
 
-import CatBank.Security.DTO.JwtDTO;
-import CatBank.Security.DTO.MensajeDTO;
-import CatBank.Security.DTO.NewUserDTO;
-import CatBank.Security.DTO.UserLoginDTO;
+import CatBank.Security.DTO.*;
 import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Model.Role;
 import CatBank.Security.Model.RoleName;
@@ -25,7 +22,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -48,8 +47,32 @@ public class AuthController {
     @Autowired
     JwtProvider jwtProvider;
 
-    @PostMapping("/newUser")
+    @PostMapping("/newAdmin")
     public ResponseEntity<?> newUser(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        if (userService.existsByUserName(newUserDTO.getUserName())) {
+            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
+        }
+
+        User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));
+
+        Set<Role> roles = new HashSet<>();
+        roles.add((roleService.getByRoleName(RoleName.ROLE_ADMIN).get()));
+        roles.add((roleService.getByRoleName(RoleName.ROLE_USER).get()));
+        roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
+        if (!newUserDTO.getUserName().contains("admin"))
+            return new ResponseEntity<>(new MensajeDTO("admin ha de estar presente en su nombre de usuario"), HttpStatus.BAD_REQUEST);
+        user.setRoles(roles);
+
+        userService.save(user);
+
+        return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/newUserThirtParty")
+    public ResponseEntity<?> newUserThirtParty(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
@@ -62,7 +85,39 @@ public class AuthController {
         Set<Role> roles = new HashSet<>();
         roles.add((roleService.getByRoleName(RoleName.ROLE_USER).get()));
         if (newUserDTO.getUserName().contains("admin"))
-            roles.add(roleService.getByRoleName(RoleName.ROLE_ADMIN).get());
+            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
+        user.setRoles(roles);
+
+        userService.save(user);
+
+        return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/newUserUserAccountHolder")
+    public ResponseEntity<?> newUserAccountHolder(@Valid @RequestBody NewUserAccountHolderDTO newUserAccountHolderDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        if (userService.existsByUserName(newUserAccountHolderDTO.getUserName())) {
+            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
+        }
+//        if (userService.existsByEmail(newUserAccountHolderDTO.getEmail())){
+//            return new ResponseEntity<>(new MensajeDTO("El mail introducido ya está registrado en otra cuenta"), HttpStatus.BAD_REQUEST);
+//        }
+        if (!newUserAccountHolderDTO.getEmail().matches("^(.+)@(\\S+)$")){
+            return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
+        }
+
+        User user = new User(newUserAccountHolderDTO.getUserName()
+                ,passwordEncoder.encode(newUserAccountHolderDTO.getPassword())
+                ,newUserAccountHolderDTO.getDateOfBirth()
+                ,newUserAccountHolderDTO.getAddress()
+                ,newUserAccountHolderDTO.getEmail());
+
+        Set<Role> roles = new HashSet<>();
+        roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
+        if (newUserAccountHolderDTO.getUserName().contains("admin"))
+            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
         user.setRoles(roles);
 
         userService.save(user);
@@ -86,6 +141,19 @@ public class AuthController {
         return new ResponseEntity<>(jwtDTO, HttpStatus.OK);
 
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/adminList")
+    public List<User> listAdmins(){
+        return userService.listAdmins();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/userList")
+    public List<User> listUsers(){
+        return userService.listUsers();
+    }
+
 
     @PreAuthorize("hasRole('USER')")
     @RequestMapping({ "/helloUser" })

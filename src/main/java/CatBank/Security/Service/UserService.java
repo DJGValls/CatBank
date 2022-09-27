@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,9 +20,22 @@ public class UserService {
         return userRepository.findByUserName(userName);
     }
 
+    public List<User> listAdmins(){
+        return userRepository.findByUserNameContains("admin");
+    }
+
+    public List<User> listUsers(){
+        return userRepository.findByUserNameNotContains("admin");
+    }
+
     public Boolean existsByUserName(String userName){
         return userRepository.existsByUserName(userName);
     }
+ //   public Boolean existsByEmail(String email){
+ //       return userRepository.existByEmail(email);
+ //   }
+
+
 
     public void save(User user){
         userRepository.save(user);
