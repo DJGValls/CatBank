@@ -3,14 +3,13 @@ package CatBank.Security.Controller;
 import CatBank.Security.DTO.*;
 import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Model.Role;
-import CatBank.Security.Model.RoleName;
+import CatBank.Security.Model.Enums.RoleName;
 import CatBank.Security.Model.User;
 import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +21,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +51,7 @@ public class AuthController {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
         if (userService.existsByUserName(newUserDTO.getUserName())) {
-            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new MensajeDTO("El nombre introducido existe o es incorrecto"), HttpStatus.BAD_REQUEST);
         }
 
         User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));

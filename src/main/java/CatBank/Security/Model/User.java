@@ -1,6 +1,7 @@
 package CatBank.Security.Model;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 
 import java.util.Date;
 import java.util.HashSet;

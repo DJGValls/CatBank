@@ -1,5 +1,6 @@
 package CatBank.Security.Model;
 
+import CatBank.Security.Model.Enums.RoleName;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;

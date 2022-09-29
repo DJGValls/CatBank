@@ -1,7 +1,7 @@
 package CatBank.Security.Repository;
 
 import CatBank.Security.Model.Role;
-import CatBank.Security.Model.RoleName;
+import CatBank.Security.Model.Enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

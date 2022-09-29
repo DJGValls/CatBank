@@ -1,7 +1,7 @@
 package CatBank.Security.Controller;
 
 import CatBank.Security.Model.Role;
-import CatBank.Security.Model.RoleName;
+import CatBank.Security.Model.Enums.RoleName;
 import CatBank.Security.Model.User;
 import CatBank.Security.Repository.RoleRepository;
 import CatBank.Security.Repository.UserRepository;

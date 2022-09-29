@@ -2,7 +2,7 @@ package CatBank.Security.Service;
 
 
 import CatBank.Security.Model.Role;
-import CatBank.Security.Model.RoleName;
+import CatBank.Security.Model.Enums.RoleName;
 import CatBank.Security.Repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

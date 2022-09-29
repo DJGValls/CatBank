@@ -1,4 +1,4 @@
-package CatBank.Security.Model;
+package CatBank.Security.Model.Enums;
 
 public enum RoleName {
 

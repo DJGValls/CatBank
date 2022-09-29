@@ -1,12 +1,6 @@
 package CatBank.Security.Utils;
 
 
-import CatBank.Security.Model.Role;
-import CatBank.Security.Model.RoleName;
-import CatBank.Security.Service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 /*
 @Component
 public class CreateRolesUtil implements CommandLineRunner {
