@@ -1,15 +1,13 @@
 package CatBank.Model;
 
 import CatBank.Model.Enums.Status;
-import CatBank.Security.Model.User;
+import CatBank.Model.User.AccountHolder;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "checking")
@@ -36,14 +34,15 @@ public class Checking extends AbstractAccount{
     @NotNull
     private BigDecimal monthlyMaintenanceFee;
 
-    @NotNull
-    @ManyToMany
-    @JoinTable(name = "user_checking", joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "checking_id"))
-    private Set<User> checkingsHashset = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "accountHolder_user")
+    private AccountHolder accountHolderUser;
 
+    public Checking() {
+        super();
+    }
 
-    public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, int checkingId, String secretKey, BigDecimal minBalance, Status status, Date creationDate, BigDecimal monthlyMaintenanceFee) {
+    public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, String secretKey, BigDecimal minBalance, Status status, Date creationDate, BigDecimal monthlyMaintenanceFee, AccountHolder accountHolderUser) {
         super(primaryOwner, secundaryOwner, balance, penaltyFee);
         this.checkingId = checkingId;
         this.secretKey = secretKey;
@@ -51,10 +50,7 @@ public class Checking extends AbstractAccount{
         this.status = status;
         this.creationDate = creationDate;
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-    }
-
-    public Checking() {
-        super();
+        this.accountHolderUser = accountHolderUser;
     }
 
     public int getCheckingId() {
@@ -81,6 +77,10 @@ public class Checking extends AbstractAccount{
         return monthlyMaintenanceFee;
     }
 
+    public AccountHolder getAccountHolderUser() {
+        return accountHolderUser;
+    }
+
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
@@ -101,11 +101,10 @@ public class Checking extends AbstractAccount{
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
     }
 
-    public Set<User> getCheckingsHashset() {
-        return checkingsHashset;
+    public void setAccountHolderUser(AccountHolder checkingUser) {
+        this.accountHolderUser = checkingUser;
     }
 
-    public void setCheckingsHashset(Set<User> checkingsHashset) {
-        this.checkingsHashset = checkingsHashset;
-    }
+
+
 }

@@ -1,16 +1,11 @@
 package CatBank.Service;
 
-import CatBank.Repository.CheckingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
+import CatBank.Model.Checking;
 
 
-@Transactional
-public class CheckingService {
 
-    @Autowired
-    CheckingRepository checkingRepository;
+public interface CheckingService {
+
+    Checking save(Checking checking);
 
 }

@@ -8,9 +8,8 @@ import java.math.BigDecimal;
 public abstract class AbstractAccount {
 
 
-
     @NotNull
-    private String PrimaryOwner;
+    private String primaryOwner;
     @NotNull
     private String secundaryOwner;
     @NotNull
@@ -18,22 +17,23 @@ public abstract class AbstractAccount {
     @NotNull
     private BigDecimal penaltyFee;
 
+    public AbstractAccount() {
+
+    }
+
     public AbstractAccount(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee) {
-        PrimaryOwner = primaryOwner;
+        this.primaryOwner = primaryOwner;
         this.secundaryOwner = secundaryOwner;
         this.balance = balance;
         this.penaltyFee = penaltyFee;
     }
 
-    public AbstractAccount() {
-    }
-
     public String getPrimaryOwner() {
-        return PrimaryOwner;
+        return primaryOwner;
     }
 
     public void setPrimaryOwner(String primaryOwner) {
-        PrimaryOwner = primaryOwner;
+        this.primaryOwner = primaryOwner;
     }
 
     public String getSecundaryOwner() {

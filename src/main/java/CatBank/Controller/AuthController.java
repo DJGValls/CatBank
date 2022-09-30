@@ -1,5 +1,6 @@
-package CatBank.Security.Controller;
+package CatBank.Controller;
 
+import CatBank.Model.User.AccountHolder;
 import CatBank.Security.DTO.*;
 import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Model.Role;
@@ -7,6 +8,8 @@ import CatBank.Security.Model.Enums.RoleName;
 import CatBank.Security.Model.User;
 import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
+import CatBank.Service.AccountHolderService;
+import CatBank.Service.CheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,9 @@ import java.util.Set;
 public class AuthController {
 
     @Autowired
+    AccountHolderService accountHolderService;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -43,9 +49,12 @@ public class AuthController {
     RoleService roleService;
 
     @Autowired
+    CheckingService checkingService;
+
+    @Autowired
     JwtProvider jwtProvider;
 
-    @PostMapping("/newAdmin")
+    @PostMapping("/newAdmin")//para crear un nuevo admin, no necesitas token
     public ResponseEntity<?> newUser(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
@@ -58,7 +67,7 @@ public class AuthController {
 
         Set<Role> roles = new HashSet<>();
         roles.add((roleService.getByRoleName(RoleName.ROLE_ADMIN).get()));
-        roles.add((roleService.getByRoleName(RoleName.ROLE_USER).get()));
+        roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
         roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
         if (!newUserDTO.getUserName().contains("admin"))
             return new ResponseEntity<>(new MensajeDTO("admin ha de estar presente en su nombre de usuario"), HttpStatus.BAD_REQUEST);
@@ -68,62 +77,7 @@ public class AuthController {
 
         return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
     }
-
-    @PostMapping("/newUserThirtParty")
-    public ResponseEntity<?> newUserThirtParty(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
-        }
-        if (userService.existsByUserName(newUserDTO.getUserName())) {
-            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
-        }
-
-        User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));
-
-        Set<Role> roles = new HashSet<>();
-        roles.add((roleService.getByRoleName(RoleName.ROLE_USER).get()));
-        if (newUserDTO.getUserName().contains("admin"))
-            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
-        user.setRoles(roles);
-
-        userService.save(user);
-
-        return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/newUserUserAccountHolder")
-    public ResponseEntity<?> newUserAccountHolder(@Valid @RequestBody NewUserAccountHolderDTO newUserAccountHolderDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
-        }
-        if (userService.existsByUserName(newUserAccountHolderDTO.getUserName())) {
-            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
-        }
-//        if (userService.existsByEmail(newUserAccountHolderDTO.getEmail())){
-//            return new ResponseEntity<>(new MensajeDTO("El mail introducido ya está registrado en otra cuenta"), HttpStatus.BAD_REQUEST);
-//        }
-        if (!newUserAccountHolderDTO.getEmail().matches("^(.+)@(\\S+)$")){
-            return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
-        }
-
-        User user = new User(newUserAccountHolderDTO.getUserName()
-                ,passwordEncoder.encode(newUserAccountHolderDTO.getPassword())
-                ,newUserAccountHolderDTO.getDateOfBirth()
-                ,newUserAccountHolderDTO.getAddress()
-                ,newUserAccountHolderDTO.getEmail());
-
-        Set<Role> roles = new HashSet<>();
-        roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
-        if (newUserAccountHolderDTO.getUserName().contains("admin"))
-            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
-        user.setRoles(roles);
-
-        userService.save(user);
-
-        return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/login")
+    @PostMapping("/login")//para obtener un token, ya sea de admin, de accountHolder o de thirdParty
     public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors())
             return new ResponseEntity(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
@@ -141,6 +95,65 @@ public class AuthController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/newUserThirdParty")//para crear un user thirdParty, solo un admin con su token puede hacerlo
+    public ResponseEntity<?> newUserThirdParty(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        if (userService.existsByUserName(newUserDTO.getUserName())) {
+            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
+        }
+
+        User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));
+
+        Set<Role> roles = new HashSet<>();
+        roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
+        if (newUserDTO.getUserName().contains("admin"))
+            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
+        user.setRoles(roles);
+
+        userService.save(user);
+
+
+        return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/newUserAccountHolder")//para crear un user accountholder, solo un admin con su token puede hacerlo
+    public ResponseEntity<?> newUserAccountHolder(@Valid @RequestBody AccountHolder accountHolder, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        if (userService.existsByUserName(accountHolder.getUserName())) {
+            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
+        }
+//        if (userService.existsByEmail(newUserAccountHolderDTO.getEmail())){
+//            return new ResponseEntity<>(new MensajeDTO("El mail introducido ya está registrado en otra cuenta"), HttpStatus.BAD_REQUEST);
+//        }
+        if (!accountHolder.getEmail().matches("^(.+)@(\\S+)$")){
+            return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
+        }
+
+        User user = new User(accountHolder.getUserName(), passwordEncoder.encode(accountHolder.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
+        if (accountHolder.getUserName().contains("admin"))
+            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
+        user.setRoles(roles);
+        userService.save(user);
+
+        AccountHolder accountHolder1 = new AccountHolder(accountHolder.getUserName()
+                ,passwordEncoder.encode(accountHolder.getPassword())
+                , accountHolder.getDateOfBirth()
+                , accountHolder.getAddress()
+                , accountHolder.getEmail());
+        accountHolderService.save(accountHolder1);
+
+                return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/adminList")
     public List<User> listAdmins(){
         return userService.listAdmins();
@@ -153,7 +166,7 @@ public class AuthController {
     }
 
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @RequestMapping({ "/helloUser" })
     public String testUser() {
         return "Hello Token de USER";

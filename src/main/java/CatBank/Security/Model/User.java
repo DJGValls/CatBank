@@ -1,12 +1,12 @@
 package CatBank.Security.Model;
 
+import CatBank.Security.Model.Role;
 import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
 
 
 @Entity
@@ -23,7 +23,7 @@ public class User {
     @NotNull
     private String password;
 
-    @NotNull
+/*    @NotNull
     private Date dateOfBirth;
 
     @NotNull
@@ -31,7 +31,7 @@ public class User {
     @NotNull
     @Column(unique = true)
     private String email;
-
+*/
 
     //Relación many to many
     //Un usuario puede tener MUCHOS roles y un rol puede PERTENECER a varios usuarios
@@ -49,14 +49,14 @@ public class User {
     }
 
     //Constructor sin id ni rol
-    public User(String userName, String password, Date dateOfBirth, String address, String email) {
+/*    public User(String userName, String password, Date dateOfBirth, String address, String email) {
         this.userName = userName;
         this.password = password;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.email = email;
     }
-
+*/
     //Constuctor sin Id ni Roles
     public User(@NotNull String userName, @NotNull String password) {
         this.userName = userName;
@@ -90,7 +90,7 @@ public class User {
         this.roles = roles;
     }
 
-    public Date getDateOfBirth() {
+/*    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -113,4 +113,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+ */
 }

@@ -49,7 +49,7 @@ class AuthControllerTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         Role roleAdmin = new Role(RoleName.ROLE_ADMIN);
-        Role roleUser = new Role(RoleName.ROLE_USER);
+        Role roleUser = new Role(RoleName.ROLE_USERTHIRDPARTY);
         User user1 = new User("Silvester","piolin");
         User user2 = new User("Tom","jerry");
         User adminUser1 = new User("admin_Isidoro", "isi");
