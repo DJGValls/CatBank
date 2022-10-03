@@ -1,5 +1,6 @@
 package CatBank.Controller;
 
+import CatBank.Model.Checking;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Security.DTO.*;
 import CatBank.Security.JasonWebToken.JwtProvider;
@@ -165,18 +166,20 @@ public class AuthController {
         return userService.listUsers();
     }
 
-
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @RequestMapping({ "/helloUser" })
-    public String testUser() {
-        return "Hello Token de USER";
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/accountHolderList")
+    public List<AccountHolder> accountHoldersList(){
+        return accountHolderService.accountHoldersList();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping({ "/helloAdmin" })
-    public String testAdmin() {
-        return "Hello Token de ADMIN";
+    @GetMapping("/checkingList")
+    public List<Checking> checkingsList(){
+        return checkingService.checkingsList();
     }
+
+
+
 
 
 

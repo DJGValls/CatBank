@@ -15,7 +15,7 @@ public abstract class AbstractAccount {
     @NotNull
     private BigDecimal balance;
     @NotNull
-    private BigDecimal penaltyFee;
+    private BigDecimal penaltyFee = BigDecimal.valueOf(40);
 
     public AbstractAccount() {
 
@@ -26,6 +26,12 @@ public abstract class AbstractAccount {
         this.secundaryOwner = secundaryOwner;
         this.balance = balance;
         this.penaltyFee = penaltyFee;
+    }
+
+    public AbstractAccount(String primaryOwner, String secundaryOwner, BigDecimal balance) {
+        this.primaryOwner = primaryOwner;
+        this.secundaryOwner = secundaryOwner;
+        this.balance = balance;
     }
 
     public String getPrimaryOwner() {

@@ -1,6 +1,7 @@
 package CatBank.Model.User;
 
 import CatBank.Model.Checking;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,7 +26,9 @@ public class AccountHolder {
     private String password;
 
     @NotNull
-    @DateTimeFormat(pattern = "dd-mm-yyyy")
+    @JsonFormat(pattern="dd-MM-yyyy")
+    @Column(name = "date_of_birth", updatable = false, nullable = false)
+    @Temporal(TemporalType.DATE)
     private Date dateOfBirth;
 
     @NotBlank
@@ -34,9 +37,7 @@ public class AccountHolder {
     @NotBlank
     private String email;
 
-    @OneToMany(mappedBy = "accountHolderUser")
-    @JsonIgnore
-    private List<Checking> chekingsList;
+
 
     public AccountHolder(String userName, String password, Date dateOfBirth, String address, String email) {
         this.userName = userName;
@@ -78,9 +79,7 @@ public class AccountHolder {
         return email;
     }
 
-    public List<Checking> getChekingsList() {
-        return chekingsList;
-    }
+
 
     public void setUserName(String userName) {
         this.userName = userName;
@@ -102,9 +101,7 @@ public class AccountHolder {
         this.email = email;
     }
 
-    public void setChekingsList(List<Checking> chekingsList) {
-        this.chekingsList = chekingsList;
-    }
+
 /*    public Set<String> getRoles() {
         return roles;
     }

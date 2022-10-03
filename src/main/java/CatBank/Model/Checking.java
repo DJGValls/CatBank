@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -18,46 +19,52 @@ public class Checking extends AbstractAccount{
     private int checkingId;
 
     @NotNull
-    private String secretKey;
+    private Integer secretKey;
 
     @NotNull
-    private BigDecimal minBalance;
+    private BigDecimal minBalance = BigDecimal.valueOf(250);
 
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @NotNull
-    @DateTimeFormat(pattern = "dd-mm-yyyy")
-    private Date creationDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "creation_date", nullable = false)
+    private Calendar creationDate = Calendar.getInstance();
 
     @NotNull
-    private BigDecimal monthlyMaintenanceFee;
+    private BigDecimal monthlyMaintenanceFee = BigDecimal.valueOf(12);
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "accountHolder_user")
-    private AccountHolder accountHolderUser;
+    @JoinColumn(name = "AccountHolder")
+    private AccountHolder accountHolder;
 
     public Checking() {
         super();
     }
 
-    public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, String secretKey, BigDecimal minBalance, Status status, Date creationDate, BigDecimal monthlyMaintenanceFee, AccountHolder accountHolderUser) {
+    public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, Integer secretKey, BigDecimal minBalance, Status status, Calendar creationDate, BigDecimal monthlyMaintenanceFee, AccountHolder accountHolder) {
         super(primaryOwner, secundaryOwner, balance, penaltyFee);
-        this.checkingId = checkingId;
         this.secretKey = secretKey;
         this.minBalance = minBalance;
         this.status = status;
         this.creationDate = creationDate;
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-        this.accountHolderUser = accountHolderUser;
+        this.accountHolder = accountHolder;
+    }
+
+    public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, Integer secretKey, Status status, AccountHolder accountHolder) {
+        super(primaryOwner, secundaryOwner, balance);
+        this.secretKey = secretKey;
+        this.status = status;
+        this.accountHolder = accountHolder;
     }
 
     public int getCheckingId() {
         return checkingId;
     }
 
-    public String getSecretKey() {
+    public Integer getSecretKey() {
         return secretKey;
     }
 
@@ -69,7 +76,7 @@ public class Checking extends AbstractAccount{
         return status;
     }
 
-    public Date getCreationDate() {
+    public Calendar getCreationDate() {
         return creationDate;
     }
 
@@ -77,11 +84,11 @@ public class Checking extends AbstractAccount{
         return monthlyMaintenanceFee;
     }
 
-    public AccountHolder getAccountHolderUser() {
-        return accountHolderUser;
+    public AccountHolder getAccountHolder() {
+        return accountHolder;
     }
 
-    public void setSecretKey(String secretKey) {
+    public void setSecretKey(Integer secretKey) {
         this.secretKey = secretKey;
     }
 
@@ -93,7 +100,7 @@ public class Checking extends AbstractAccount{
         this.status = status;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Calendar creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -101,10 +108,8 @@ public class Checking extends AbstractAccount{
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
     }
 
-    public void setAccountHolderUser(AccountHolder checkingUser) {
-        this.accountHolderUser = checkingUser;
+    public void setAccountHolder(AccountHolder accountHolder) {
+        this.accountHolder = accountHolder;
     }
-
-
 
 }

@@ -3,6 +3,7 @@ package CatBank.Controller;
 import CatBank.Model.Checking;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
+import CatBank.Model.User.DTO.CheckingDTO;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Model.Enums.RoleName;
@@ -50,6 +51,49 @@ public class CheckingController {
     JwtProvider jwtProvider;
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PostMapping("/createCheckingTest")
+    public Checking create(@RequestBody CheckingDTO checkingDTO){
+        Checking checking1 = new Checking(checkingDTO.getPrimaryOwner(),
+                checkingDTO.getSecundaryOwner(),
+                checkingDTO.getBalance(),
+                checkingDTO.getSecretKey(),
+                checkingDTO.getStatus(),
+                checkingDTO.getAccountHolder());
+
+        checkingService.save(checking1);
+
+        return checking1;
+    }
+
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PostMapping("/createChecking")//para crear una cuenta checking, solo un accountHolder o un admin con sus tokens pueden hacerlo
+    public ResponseEntity<?> createChecking(@Valid @RequestBody CheckingDTO checkingDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+//        if (userService.existsByUserName(accountHolder.getUserName())) {
+//            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
+//        }
+//        if (userService.existsByEmail(newUserAccountHolderDTO.getEmail())){
+//            return new ResponseEntity<>(new MensajeDTO("El mail introducido ya está registrado en otra cuenta"), HttpStatus.BAD_REQUEST);
+//        }
+//        if (!checking.getEmail().matches("^(.+)@(\\S+)$")){
+//            return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
+//        }(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, String secretKey, BigDecimal minBalance, Status status, LocalDateTime creationDate, BigDecimal monthlyMaintenanceFee, AccountHolder accountHolder
+        Checking checking1 = new Checking(checkingDTO.getPrimaryOwner(),
+                checkingDTO.getSecundaryOwner(),
+                checkingDTO.getBalance(),
+                checkingDTO.getSecretKey(),
+                checkingDTO.getStatus(),
+                checkingDTO.getAccountHolder());
+
+        checkingService.save(checking1);
+
+        return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
+    }
+
+/*
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping("/createChecking")//para crear una cuenta checking, solo un accountHolder o un admin con sus tokens pueden hacerlo
     public ResponseEntity<?> createChecking(@Valid @RequestBody Checking checking, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -80,4 +124,6 @@ public class CheckingController {
         return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
     }
 
+
+ */
 }

@@ -6,6 +6,8 @@ import CatBank.Repository.CheckingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CheckingServiceImp implements CheckingService{
 
@@ -15,6 +17,11 @@ public class CheckingServiceImp implements CheckingService{
     @Override
     public Checking save(Checking checking){
         return checkingRepository.save(checking);
+    }
+
+    @Override
+    public List<Checking> checkingsList() {
+        return checkingRepository.findAll();
     }
 
 }
