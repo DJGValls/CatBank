@@ -2,6 +2,7 @@ package CatBank.Controller;
 
 import CatBank.Model.Checking;
 import CatBank.Model.User.AccountHolder;
+import CatBank.Model.User.DTO.CheckingDTO;
 import CatBank.Security.DTO.*;
 import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Model.Role;
@@ -126,11 +127,11 @@ public class AuthController {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
         if (userService.existsByUserName(accountHolder.getUserName())) {
-            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new MensajeDTO(accountHolder.getUserName() + " está en uso, cambie su nombre de usario"), HttpStatus.BAD_REQUEST);
         }
-//        if (userService.existsByEmail(newUserAccountHolderDTO.getEmail())){
-//            return new ResponseEntity<>(new MensajeDTO("El mail introducido ya está registrado en otra cuenta"), HttpStatus.BAD_REQUEST);
-//        }
+        if (accountHolderService.existByEmail(accountHolder.getEmail())){
+            return new ResponseEntity<>(new MensajeDTO(accountHolder.getEmail() + " ya está en uso"), HttpStatus.BAD_REQUEST);
+        }
         if (!accountHolder.getEmail().matches("^(.+)@(\\S+)$")){
             return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
         }
@@ -139,7 +140,7 @@ public class AuthController {
         Set<Role> roles = new HashSet<>();
         roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
         if (accountHolder.getUserName().contains("admin"))
-            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new MensajeDTO("nombre de usuario no puede contener la palabra admin, pruebe una vez más"), HttpStatus.BAD_REQUEST);
         user.setRoles(roles);
         userService.save(user);
 
@@ -150,7 +151,35 @@ public class AuthController {
                 , accountHolder.getEmail());
         accountHolderService.save(accountHolder1);
 
-                return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
+                return new ResponseEntity<>(new MensajeDTO("Usuario AccountHolder Creado"), HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/createChecking")//para crear una cuenta checking, solo un Admin con su token pueden hacerlo
+    public ResponseEntity<?> createChecking(@Valid @RequestBody CheckingDTO checkingDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        if (!accountHolderService.existsByAccountHolderId(checkingDTO.getAccountHolder().getAccountHolderId())||!accountHolderService.existByEmail(checkingDTO.getAccountHolder().getEmail())){
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " no existe, revise si ha sido creado y que su id y sus datos estén correctos"), HttpStatus.BAD_REQUEST);
+        }
+        if (checkingService.existsByPrimaryOwner(checkingDTO.getPrimaryOwner())){
+            return new ResponseEntity<>(new MensajeDTO(checkingDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
+        }
+
+//        if (!checking.getEmail().matches("^(.+)@(\\S+)$")){
+//            return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
+//        }(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, String secretKey, BigDecimal minBalance, Status status, LocalDateTime creationDate, BigDecimal monthlyMaintenanceFee, AccountHolder accountHolder
+        Checking checking1 = new Checking(checkingDTO.getPrimaryOwner(),
+                checkingDTO.getSecundaryOwner(),
+                checkingDTO.getBalance(),
+                checkingDTO.getSecretKey(),
+                checkingDTO.getStatus(),
+                checkingDTO.getAccountHolder());
+
+        checkingService.save(checking1);
+
+        return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
     }
 
 

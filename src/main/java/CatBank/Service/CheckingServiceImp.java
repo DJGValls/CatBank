@@ -2,6 +2,7 @@ package CatBank.Service;
 
 
 import CatBank.Model.Checking;
+import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.CheckingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,5 +24,11 @@ public class CheckingServiceImp implements CheckingService{
     public List<Checking> checkingsList() {
         return checkingRepository.findAll();
     }
+
+    @Override
+    public boolean existsByPrimaryOwner(String primaryOwner) {
+        return checkingRepository.existsByPrimaryOwner(primaryOwner);
+    }
+
 
 }

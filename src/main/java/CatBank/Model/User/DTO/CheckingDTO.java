@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 public class CheckingDTO {
 
+
     @NotNull
     private String primaryOwner;
     @NotNull
