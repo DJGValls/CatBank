@@ -13,7 +13,7 @@ public class CheckingDTO {
     private String primaryOwner;
     @NotNull
     private String secundaryOwner;
-    @NotNull
+
     private BigDecimal balance;
     @NotNull
     private Integer SecretKey;
@@ -22,18 +22,9 @@ public class CheckingDTO {
     @NotNull
     private AccountHolder accountHolder;
 
+
     public CheckingDTO() {
     }
-
-    public CheckingDTO(String primaryOwner, String secundaryOwner, BigDecimal balance, Integer secretKey, Status status, AccountHolder accountHolder) {
-        this.primaryOwner = primaryOwner;
-        this.secundaryOwner = secundaryOwner;
-        this.balance = balance;
-        SecretKey = secretKey;
-        this.status = status;
-        this.accountHolder = accountHolder;
-    }
-
 
     public String getPrimaryOwner() {
         return primaryOwner;

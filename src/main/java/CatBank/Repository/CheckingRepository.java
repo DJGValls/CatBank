@@ -11,4 +11,6 @@ public interface CheckingRepository extends JpaRepository<Checking, Integer> {
     boolean existsByPrimaryOwner(String primaryOwner);
 
 
+
+
 }

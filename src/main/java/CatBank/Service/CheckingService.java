@@ -14,4 +14,8 @@ public interface CheckingService {
 
     boolean existsByPrimaryOwner(String primaryOwner);
 
+    boolean existsByAccountHolderId(int accountHolderId);
+
+    public void deleteChecking(int accountHolderId);
+
 }

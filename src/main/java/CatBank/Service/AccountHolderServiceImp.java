@@ -5,6 +5,8 @@ import CatBank.Repository.AccountHolderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +18,11 @@ public class AccountHolderServiceImp implements AccountHolderService{
     @Override
     public AccountHolder save(AccountHolder accountHolder) {
         return accountHolderRepository.save(accountHolder);
+    }
+
+    @Override
+    public void delete(int accountHolderId) {
+        accountHolderRepository.deleteById(accountHolderId);
     }
 
     @Override
@@ -41,6 +48,11 @@ public class AccountHolderServiceImp implements AccountHolderService{
     @Override
     public boolean existsByUserName(String userName) {
         return accountHolderRepository.existsByUserName(userName);
+    }
+
+    @Override
+    public boolean existsByDateOfBirthIsBetween(Date dateOfBirth, Calendar instanceDate) {
+        return accountHolderRepository.existsByDateOfBirthIsBetween(dateOfBirth,instanceDate);
     }
 
 

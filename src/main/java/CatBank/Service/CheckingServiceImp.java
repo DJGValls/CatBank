@@ -30,5 +30,15 @@ public class CheckingServiceImp implements CheckingService{
         return checkingRepository.existsByPrimaryOwner(primaryOwner);
     }
 
+    @Override
+    public boolean existsByAccountHolderId(int accountHolderId) {
+        return checkingRepository.existsById(accountHolderId);
+    }
+    @Override
+    public void deleteChecking(int accountHolderId) {
+        checkingRepository.deleteById(accountHolderId);
+
+    }
+
 
 }

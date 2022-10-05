@@ -1,5 +1,6 @@
 package CatBank.Model;
 
+import javax.persistence.Embedded;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -12,26 +13,20 @@ public abstract class AbstractAccount {
     private String primaryOwner;
     @NotNull
     private String secundaryOwner;
-    @NotNull
+
     private BigDecimal balance;
     @NotNull
-    private BigDecimal penaltyFee = BigDecimal.valueOf(40);
+    private BigDecimal penaltyFee;
 
     public AbstractAccount() {
 
-    }
-
-    public AbstractAccount(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee) {
-        this.primaryOwner = primaryOwner;
-        this.secundaryOwner = secundaryOwner;
-        this.balance = balance;
-        this.penaltyFee = penaltyFee;
     }
 
     public AbstractAccount(String primaryOwner, String secundaryOwner, BigDecimal balance) {
         this.primaryOwner = primaryOwner;
         this.secundaryOwner = secundaryOwner;
         this.balance = balance;
+        this.penaltyFee = BigDecimal.valueOf(40);
     }
 
     public String getPrimaryOwner() {

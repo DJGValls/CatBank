@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -26,10 +27,10 @@ public class AccountHolder {
     private String password;
 
     @NotNull
-    @JsonFormat(pattern="dd-MM-yyyy")
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "date_of_birth", updatable = false, nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date dateOfBirth;
+    //@Temporal(TemporalType.DATE)
+    private LocalDate dateOfBirth;
 
     @NotBlank
     private String address;
@@ -39,7 +40,7 @@ public class AccountHolder {
 
 
 
-    public AccountHolder(String userName, String password, Date dateOfBirth, String address, String email) {
+    public AccountHolder(String userName, String password, LocalDate dateOfBirth, String address, String email) {
         this.userName = userName;
         this.password = password;
         this.dateOfBirth = dateOfBirth;
@@ -67,7 +68,7 @@ public class AccountHolder {
         return password;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -89,7 +90,7 @@ public class AccountHolder {
         this.password = password;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

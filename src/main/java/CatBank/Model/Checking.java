@@ -2,13 +2,11 @@ package CatBank.Model;
 
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "checking")
@@ -22,18 +20,18 @@ public class Checking extends AbstractAccount{
     private Integer secretKey;
 
     @NotNull
-    private BigDecimal minBalance = BigDecimal.valueOf(250);
+    private BigDecimal minBalance;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    //@Temporal(TemporalType.TIMESTAMP)
     @Column(name = "creation_date", nullable = false)
-    private Calendar creationDate = Calendar.getInstance();
+    private LocalDate creationDate;
 
     @NotNull
-    private BigDecimal monthlyMaintenanceFee = BigDecimal.valueOf(12);
+    private BigDecimal monthlyMaintenanceFee;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "AccountHolder")
@@ -43,23 +41,15 @@ public class Checking extends AbstractAccount{
         super();
     }
 
-    public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, Integer secretKey, BigDecimal minBalance, Status status, Calendar creationDate, BigDecimal monthlyMaintenanceFee, AccountHolder accountHolder) {
-        super(primaryOwner, secundaryOwner, balance, penaltyFee);
-        this.secretKey = secretKey;
-        this.minBalance = minBalance;
-        this.status = status;
-        this.creationDate = creationDate;
-        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-        this.accountHolder = accountHolder;
-    }
-
     public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, Integer secretKey, Status status, AccountHolder accountHolder) {
         super(primaryOwner, secundaryOwner, balance);
         this.secretKey = secretKey;
+        this.minBalance = BigDecimal.valueOf(250);
         this.status = status;
+        this.creationDate = LocalDate.now();
+        this.monthlyMaintenanceFee = BigDecimal.valueOf(12);
         this.accountHolder = accountHolder;
     }
-
     public int getCheckingId() {
         return checkingId;
     }
@@ -76,7 +66,7 @@ public class Checking extends AbstractAccount{
         return status;
     }
 
-    public Calendar getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 
@@ -100,7 +90,7 @@ public class Checking extends AbstractAccount{
         this.status = status;
     }
 
-    public void setCreationDate(Calendar creationDate) {
+    public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
 

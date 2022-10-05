@@ -31,14 +31,15 @@ public class UserService {
     public Boolean existsByUserName(String userName){
         return userRepository.existsByUserName(userName);
     }
- //   public Boolean existsByEmail(String email){
- //       return userRepository.existByEmail(email);
- //   }
-
-
-
     public void save(User user){
         userRepository.save(user);
+    }
+
+    public boolean existsByUserId(int userId){
+        return userRepository.existsById(userId);
+    }
+    public void deleteUser(int userId){
+        userRepository.deleteById(userId);
     }
 
 }

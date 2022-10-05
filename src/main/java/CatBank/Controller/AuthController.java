@@ -26,6 +26,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,6 +59,22 @@ public class AuthController {
     @Autowired
     JwtProvider jwtProvider;
 
+    @PostMapping("/login")//para obtener un token, ya sea de admin, de accountHolder o de thirdParty
+    public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
+        if (bindingResult.hasErrors())
+            return new ResponseEntity(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+
+        Authentication authentication =
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getUserName(),
+                        userLoginDTO.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtProvider.generateToken(authentication);
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        JwtDTO jwtDTO = new JwtDTO(jwt, userDetails.getUsername(), userDetails.getAuthorities());
+        return new ResponseEntity<>(jwtDTO, HttpStatus.OK);
+    }
+
     @PostMapping("/newAdmin")//para crear un nuevo admin, no necesitas token
     public ResponseEntity<?> newUser(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -78,22 +97,6 @@ public class AuthController {
         userService.save(user);
 
         return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
-    }
-    @PostMapping("/login")//para obtener un token, ya sea de admin, de accountHolder o de thirdParty
-    public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
-        if (bindingResult.hasErrors())
-            return new ResponseEntity(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
-
-        Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getUserName(),
-                        userLoginDTO.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtProvider.generateToken(authentication);
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        JwtDTO jwtDTO = new JwtDTO(jwt, userDetails.getUsername(), userDetails.getAuthorities());
-        return new ResponseEntity<>(jwtDTO, HttpStatus.OK);
-
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -119,9 +122,17 @@ public class AuthController {
 
         return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
     }
+    @PreAuthorize("hasRole('ADMIN')")//para borrar un user admin, thirdparty o accountholder. Solo un admin puede hacerlo
+    @DeleteMapping("/deleteUser/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable("userId") int userId){
+        if (!userService.existsByUserId(userId))
+            return new ResponseEntity(new MensajeDTO("No existe ese usuario"), HttpStatus.NOT_FOUND);
+        userService.deleteUser(userId);
+        return new ResponseEntity(new MensajeDTO("Usuario eliminado"), HttpStatus.OK);
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/newUserAccountHolder")//para crear un user accountholder, solo un admin con su token puede hacerlo
+    @PostMapping("/newUserAccountHolder")//para crear una accountholder, solo un admin con su token puede hacerlo
     public ResponseEntity<?> newUserAccountHolder(@Valid @RequestBody AccountHolder accountHolder, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
@@ -153,9 +164,17 @@ public class AuthController {
 
                 return new ResponseEntity<>(new MensajeDTO("Usuario AccountHolder Creado"), HttpStatus.CREATED);
     }
+    @PreAuthorize("hasRole('ADMIN')")//para borrar un accountholder, solo un admin puede hacerlo
+    @DeleteMapping("/deleteAccountHolder/{accountHolderId}")
+    public ResponseEntity<?> delete(@PathVariable("accountHolderId") int accountHolderId){
+        if (!accountHolderService.existsByAccountHolderId(accountHolderId))
+            return new ResponseEntity(new MensajeDTO("No existe ese usuario"), HttpStatus.NOT_FOUND);
+        accountHolderService.delete(accountHolderId);
+        return new ResponseEntity(new MensajeDTO("Usuario eliminado"), HttpStatus.OK);
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/createChecking")//para crear una cuenta checking, solo un Admin con su token pueden hacerlo
+    @PostMapping("/createChecking")//para crear una cuenta checking, solo un Admin puede hacerlo
     public ResponseEntity<?> createChecking(@Valid @RequestBody CheckingDTO checkingDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
@@ -164,12 +183,15 @@ public class AuthController {
             return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " no existe, revise si ha sido creado y que su id y sus datos estén correctos"), HttpStatus.BAD_REQUEST);
         }
         if (checkingService.existsByPrimaryOwner(checkingDTO.getPrimaryOwner())){
-            return new ResponseEntity<>(new MensajeDTO(checkingDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
+        }
+        LocalDate start = LocalDate.from(checkingDTO.getAccountHolder().getDateOfBirth());
+        LocalDate end = LocalDate.now();
+        long years = ChronoUnit.YEARS.between(start, end);
+        if(years < 24){
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " es menor de 24 años, solo las cuentas StudentChecking están disponibles para ese rango de edad" ), HttpStatus.BAD_REQUEST);
         }
 
-//        if (!checking.getEmail().matches("^(.+)@(\\S+)$")){
-//            return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
-//        }(String primaryOwner, String secundaryOwner, BigDecimal balance, BigDecimal penaltyFee, String secretKey, BigDecimal minBalance, Status status, LocalDateTime creationDate, BigDecimal monthlyMaintenanceFee, AccountHolder accountHolder
         Checking checking1 = new Checking(checkingDTO.getPrimaryOwner(),
                 checkingDTO.getSecundaryOwner(),
                 checkingDTO.getBalance(),
@@ -180,6 +202,14 @@ public class AuthController {
         checkingService.save(checking1);
 
         return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
+    }
+    @PreAuthorize("hasRole('ADMIN')")//para borrar un Checking, solo un admin puede hacerlo
+    @DeleteMapping("/deleteChecking/{checkingId}")
+    public ResponseEntity<?> deleteChecking(@PathVariable("checkingId") int checkingId){
+        if (!checkingService.existsByAccountHolderId(checkingId))
+            return new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
+        checkingService.deleteChecking(checkingId);
+        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
     }
 
 
