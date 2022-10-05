@@ -1,5 +1,9 @@
 package CatBank.Model;
 
+import CatBank.Utils.Money;
+import org.springframework.lang.Nullable;
+
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
@@ -13,16 +17,18 @@ public abstract class AbstractAccount {
     private String primaryOwner;
     @NotNull
     private String secundaryOwner;
-
-    private BigDecimal balance;
+    @Embedded
+    @Nullable
+    private Money balance ;// = new Money(new BigDecimal(0));
     @NotNull
     private BigDecimal penaltyFee;
 
     public AbstractAccount() {
-
+        this.balance = new Money(new BigDecimal(0));
     }
 
-    public AbstractAccount(String primaryOwner, String secundaryOwner, BigDecimal balance) {
+    public AbstractAccount(String primaryOwner, String secundaryOwner, Money balance) {
+        this();
         this.primaryOwner = primaryOwner;
         this.secundaryOwner = secundaryOwner;
         this.balance = balance;
@@ -45,11 +51,11 @@ public abstract class AbstractAccount {
         this.secundaryOwner = secundaryOwner;
     }
 
-    public BigDecimal getBalance() {
+    public Money getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Money balance) {
         this.balance = balance;
     }
 

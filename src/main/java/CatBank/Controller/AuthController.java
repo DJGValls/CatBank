@@ -12,6 +12,7 @@ import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
 import CatBank.Service.AccountHolderService;
 import CatBank.Service.CheckingService;
+import CatBank.Utils.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +27,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -192,9 +193,11 @@ public class AuthController {
             return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " es menor de 24 años, solo las cuentas StudentChecking están disponibles para ese rango de edad" ), HttpStatus.BAD_REQUEST);
         }
 
+
         Checking checking1 = new Checking(checkingDTO.getPrimaryOwner(),
                 checkingDTO.getSecundaryOwner(),
-                checkingDTO.getBalance(),
+                new Money(new BigDecimal(checkingDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
+                        Currency.getInstance(checkingDTO.getBalance().getCurrencyCode())),
                 checkingDTO.getSecretKey(),
                 checkingDTO.getStatus(),
                 checkingDTO.getAccountHolder());

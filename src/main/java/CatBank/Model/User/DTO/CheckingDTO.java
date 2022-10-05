@@ -14,7 +14,7 @@ public class CheckingDTO {
     @NotNull
     private String secundaryOwner;
 
-    private BigDecimal balance;
+    private MoneyDTO balance;
     @NotNull
     private Integer SecretKey;
     @NotNull
@@ -34,7 +34,7 @@ public class CheckingDTO {
         return secundaryOwner;
     }
 
-    public BigDecimal getBalance() {
+    public MoneyDTO getBalance() {
         return balance;
     }
 
@@ -58,7 +58,7 @@ public class CheckingDTO {
         this.secundaryOwner = secundaryOwner;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(MoneyDTO balance) {
         this.balance = balance;
     }
 

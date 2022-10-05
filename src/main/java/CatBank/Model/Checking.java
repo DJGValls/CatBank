@@ -2,6 +2,7 @@ package CatBank.Model;
 
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
+import CatBank.Utils.Money;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -41,7 +42,7 @@ public class Checking extends AbstractAccount{
         super();
     }
 
-    public Checking(String primaryOwner, String secundaryOwner, BigDecimal balance, Integer secretKey, Status status, AccountHolder accountHolder) {
+    public Checking(String primaryOwner, String secundaryOwner, Money balance, Integer secretKey, Status status, AccountHolder accountHolder) {
         super(primaryOwner, secundaryOwner, balance);
         this.secretKey = secretKey;
         this.minBalance = BigDecimal.valueOf(250);
