@@ -2,6 +2,7 @@ package CatBank.Model.User.DTO;
 
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
+import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ public class CheckingDTO {
 
     @NotNull
     private String primaryOwner;
-    @NotNull
+    @Nullable
     private String secundaryOwner;
 
     private MoneyDTO balance;

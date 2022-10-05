@@ -52,6 +52,9 @@ public class AccountHolder {
 
     }
 
+    public AccountHolder(String userName) {
+    }
+
     //Por defecto crea un usuario normal
     //Si quiero un usuario Admin debo pasar este campo roles
     //private Set<String> roles = new HashSet<>();

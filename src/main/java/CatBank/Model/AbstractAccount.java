@@ -3,9 +3,7 @@ package CatBank.Model;
 import CatBank.Utils.Money;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -15,13 +13,20 @@ public abstract class AbstractAccount {
 
     @NotNull
     private String primaryOwner;
-    @NotNull
+    @Nullable
     private String secundaryOwner;
     @Embedded
     @Nullable
-    private Money balance ;// = new Money(new BigDecimal(0));
-    @NotNull
-    private BigDecimal penaltyFee;
+    @AttributeOverrides({
+            @AttributeOverride( name = "currency", column = @Column(name = "balance_currency_code")),
+            @AttributeOverride( name = "amount", column = @Column(name = "balance"))})
+    private Money balance ;
+    @Embedded
+    @Nullable
+    @AttributeOverrides({
+            @AttributeOverride( name = "currency", column = @Column(name = "penaltyFee_currency_code")),
+            @AttributeOverride( name = "amount", column = @Column(name = "penaltyFee"))})
+    private Money penaltyFee;
 
     public AbstractAccount() {
         this.balance = new Money(new BigDecimal(0));
@@ -32,7 +37,7 @@ public abstract class AbstractAccount {
         this.primaryOwner = primaryOwner;
         this.secundaryOwner = secundaryOwner;
         this.balance = balance;
-        this.penaltyFee = BigDecimal.valueOf(40);
+        this.penaltyFee = new Money(new BigDecimal(40));
     }
 
     public String getPrimaryOwner() {
@@ -59,11 +64,11 @@ public abstract class AbstractAccount {
         this.balance = balance;
     }
 
-    public BigDecimal getPenaltyFee() {
+    public Money getPenaltyFee() {
         return penaltyFee;
     }
 
-    public void setPenaltyFee(BigDecimal penaltyFee) {
+    public void setPenaltyFee(Money penaltyFee) {
         this.penaltyFee = penaltyFee;
     }
 }

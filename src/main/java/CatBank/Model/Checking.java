@@ -3,6 +3,7 @@ package CatBank.Model;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Utils.Money;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,8 +21,12 @@ public class Checking extends AbstractAccount{
     @NotNull
     private Integer secretKey;
 
-    @NotNull
-    private BigDecimal minBalance;
+    @Embedded
+    @Nullable
+    @AttributeOverrides({
+            @AttributeOverride( name = "currency", column = @Column(name = "minBalanceCurrencyCode")),
+            @AttributeOverride( name = "amount", column = @Column(name = "minBalance"))})
+    private Money minBalance;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -31,8 +36,12 @@ public class Checking extends AbstractAccount{
     @Column(name = "creation_date", nullable = false)
     private LocalDate creationDate;
 
-    @NotNull
-    private BigDecimal monthlyMaintenanceFee;
+    @Embedded
+    @Nullable
+    @AttributeOverrides({
+            @AttributeOverride( name = "currency", column = @Column(name = "monthlyMaintenanceFeeCurrencyCode")),
+            @AttributeOverride( name = "amount", column = @Column(name = "monthlyMaintenanceFee"))})
+    private Money monthlyMaintenanceFee;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "AccountHolder")
@@ -45,10 +54,10 @@ public class Checking extends AbstractAccount{
     public Checking(String primaryOwner, String secundaryOwner, Money balance, Integer secretKey, Status status, AccountHolder accountHolder) {
         super(primaryOwner, secundaryOwner, balance);
         this.secretKey = secretKey;
-        this.minBalance = BigDecimal.valueOf(250);
+        this.minBalance = new Money(new BigDecimal(250));
         this.status = status;
         this.creationDate = LocalDate.now();
-        this.monthlyMaintenanceFee = BigDecimal.valueOf(12);
+        this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.accountHolder = accountHolder;
     }
     public int getCheckingId() {
@@ -59,7 +68,7 @@ public class Checking extends AbstractAccount{
         return secretKey;
     }
 
-    public BigDecimal getMinBalance() {
+    public Money getMinBalance() {
         return minBalance;
     }
 
@@ -71,7 +80,7 @@ public class Checking extends AbstractAccount{
         return creationDate;
     }
 
-    public BigDecimal getMonthlyMaintenanceFee() {
+    public Money getMonthlyMaintenanceFee() {
         return monthlyMaintenanceFee;
     }
 
@@ -83,7 +92,7 @@ public class Checking extends AbstractAccount{
         this.secretKey = secretKey;
     }
 
-    public void setMinBalance(BigDecimal minBalance) {
+    public void setMinBalance(Money minBalance) {
         this.minBalance = minBalance;
     }
 
@@ -95,7 +104,7 @@ public class Checking extends AbstractAccount{
         this.creationDate = creationDate;
     }
 
-    public void setMonthlyMaintenanceFee(BigDecimal monthlyMaintenanceFee) {
+    public void setMonthlyMaintenanceFee(Money monthlyMaintenanceFee) {
         this.monthlyMaintenanceFee = monthlyMaintenanceFee;
     }
 
