@@ -3,16 +3,18 @@ package CatBank.Controller;
 import CatBank.Model.Checking;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Model.User.DTO.CheckingDTO;
-import CatBank.Security.DTO.*;
+import CatBank.Security.DTO.JwtDTO;
+import CatBank.Security.DTO.MensajeDTO;
+import CatBank.Security.DTO.NewUserDTO;
+import CatBank.Security.DTO.UserLoginDTO;
 import CatBank.Security.JasonWebToken.JwtProvider;
-import CatBank.Security.Model.Role;
 import CatBank.Security.Model.Enums.RoleName;
+import CatBank.Security.Model.Role;
 import CatBank.Security.Model.User;
 import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
 import CatBank.Service.AccountHolderService;
 import CatBank.Service.CheckingService;
-import CatBank.Utils.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +29,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/auth")
@@ -64,13 +65,11 @@ public class AuthController {
     public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors())
             return new ResponseEntity(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
-
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getUserName(),
                         userLoginDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtProvider.generateToken(authentication);
-
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         JwtDTO jwtDTO = new JwtDTO(jwt, userDetails.getUsername(), userDetails.getAuthorities());
         return new ResponseEntity<>(jwtDTO, HttpStatus.OK);
@@ -84,9 +83,7 @@ public class AuthController {
         if (userService.existsByUserName(newUserDTO.getUserName())) {
             return new ResponseEntity<>(new MensajeDTO("El nombre introducido existe o es incorrecto"), HttpStatus.BAD_REQUEST);
         }
-
         User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));
-
         Set<Role> roles = new HashSet<>();
         roles.add((roleService.getByRoleName(RoleName.ROLE_ADMIN).get()));
         roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
@@ -94,9 +91,7 @@ public class AuthController {
         if (!newUserDTO.getUserName().contains("admin"))
             return new ResponseEntity<>(new MensajeDTO("admin ha de estar presente en su nombre de usuario"), HttpStatus.BAD_REQUEST);
         user.setRoles(roles);
-
         userService.save(user);
-
         return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
     }
 
@@ -109,18 +104,13 @@ public class AuthController {
         if (userService.existsByUserName(newUserDTO.getUserName())) {
             return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
         }
-
         User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));
-
         Set<Role> roles = new HashSet<>();
         roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
         if (newUserDTO.getUserName().contains("admin"))
             return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
         user.setRoles(roles);
-
         userService.save(user);
-
-
         return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un user admin, thirdparty o accountholder. Solo un admin puede hacerlo
@@ -147,7 +137,6 @@ public class AuthController {
         if (!accountHolder.getEmail().matches("^(.+)@(\\S+)$")){
             return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
         }
-
         User user = new User(accountHolder.getUserName(), passwordEncoder.encode(accountHolder.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
@@ -156,14 +145,8 @@ public class AuthController {
         user.setRoles(roles);
         userService.save(user);
 
-        AccountHolder accountHolder1 = new AccountHolder(accountHolder.getUserName()
-                ,passwordEncoder.encode(accountHolder.getPassword())
-                , accountHolder.getDateOfBirth()
-                , accountHolder.getAddress()
-                , accountHolder.getEmail());
-        accountHolderService.save(accountHolder1);
-
-                return new ResponseEntity<>(new MensajeDTO("Usuario AccountHolder Creado"), HttpStatus.CREATED);
+        accountHolderService.accountHolderFactory(accountHolder);
+        return new ResponseEntity<>(new MensajeDTO("Usuario AccountHolder Creado"), HttpStatus.CREATED);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un accountholder, solo un admin puede hacerlo
     @DeleteMapping("/deleteAccountHolder/{accountHolderId}")
@@ -186,24 +169,16 @@ public class AuthController {
         if (checkingService.existsByPrimaryOwner(checkingDTO.getPrimaryOwner())){
             return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
         }
+        if (!checkingDTO.getAccountHolder().getUserName().equals(checkingDTO.getPrimaryOwner())){
+            return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
+        }
         LocalDate start = LocalDate.from(checkingDTO.getAccountHolder().getDateOfBirth());
         LocalDate end = LocalDate.now();
         long years = ChronoUnit.YEARS.between(start, end);
         if(years < 24){
             return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " es menor de 24 años, solo las cuentas StudentChecking están disponibles para ese rango de edad" ), HttpStatus.BAD_REQUEST);
         }
-
-
-        Checking checking1 = new Checking(checkingDTO.getPrimaryOwner(),
-                checkingDTO.getSecundaryOwner(),
-                new Money(new BigDecimal(checkingDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
-                        Currency.getInstance(checkingDTO.getBalance().getCurrencyCode())),
-                checkingDTO.getSecretKey(),
-                checkingDTO.getStatus(),
-                checkingDTO.getAccountHolder());
-
-        checkingService.save(checking1);
-
+        checkingService.checkingFactory(checkingDTO);
         return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un Checking, solo un admin puede hacerlo

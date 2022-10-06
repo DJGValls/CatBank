@@ -1,6 +1,7 @@
 package CatBank.Service;
 
 import CatBank.Model.User.AccountHolder;
+import CatBank.Model.User.DTO.CheckingDTO;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +25,8 @@ public interface AccountHolderService {
     boolean existsByUserName(String userName);
 
     boolean existsByDateOfBirthIsBetween(Date dateOfBirth, Calendar instanceDate);
+
+    AccountHolder accountHolderFactory(AccountHolder accountHolder);
 
 
 }

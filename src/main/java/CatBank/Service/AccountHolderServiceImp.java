@@ -3,6 +3,7 @@ package CatBank.Service;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.AccountHolderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -15,6 +16,9 @@ public class AccountHolderServiceImp implements AccountHolderService{
 
     @Autowired
     AccountHolderRepository accountHolderRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
     @Override
     public AccountHolder save(AccountHolder accountHolder) {
         return accountHolderRepository.save(accountHolder);
@@ -53,6 +57,17 @@ public class AccountHolderServiceImp implements AccountHolderService{
     @Override
     public boolean existsByDateOfBirthIsBetween(Date dateOfBirth, Calendar instanceDate) {
         return accountHolderRepository.existsByDateOfBirthIsBetween(dateOfBirth,instanceDate);
+    }
+
+    @Override
+    public AccountHolder accountHolderFactory(AccountHolder accountHolder) {
+        AccountHolder accountHolder1 = new AccountHolder(accountHolder.getUserName()
+                ,passwordEncoder.encode(accountHolder.getPassword())
+                , accountHolder.getDateOfBirth()
+                , accountHolder.getAddress()
+                , accountHolder.getEmail());
+        return accountHolderRepository.save(accountHolder1);
+
     }
 
 
