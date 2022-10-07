@@ -37,8 +37,8 @@ public class CheckingController {
 
 @PreAuthorize("hasRole('ACCOUNTHOLDER')")
 @GetMapping("/checking/balance/{checkingId}")
-    public BigDecimal getBalance(@PathVariable(value = "checkingId") int checkingId){
-    return checkingService.getBalance(checkingId);
+    public void getBalance(@PathVariable(value = "checkingId") int checkingId){
+    checkingService.feeApplycations(checkingId);
 }
 
 }

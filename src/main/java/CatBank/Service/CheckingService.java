@@ -21,7 +21,7 @@ public interface CheckingService {
 
     Checking checkingFactory(CheckingDTO checkingDTO);
 
-    BigDecimal getBalance(int checkingId);
+    void feeApplycations(int checkingId);
 
     public void penaltyFeeApply(int checkingId);
 

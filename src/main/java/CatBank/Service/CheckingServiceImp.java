@@ -64,7 +64,7 @@ public class CheckingServiceImp implements CheckingService{
     }
 
     @Override
-    public BigDecimal getBalance(int checkingId) {
+    public void feeApplycations(int checkingId) {
         Optional<Checking> checkin1 = checkingRepository.findById(checkingId);
         if(checkin1.isPresent()){
             while(LocalDate.now().isAfter(checkin1.get().getLastMaintenanceFee().plusMonths(1))){
@@ -74,7 +74,7 @@ public class CheckingServiceImp implements CheckingService{
                 checkingRepository.save(checkin1.get());
             }
         } new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
-        return checkin1.get().getBalance().getAmount();
+        checkin1.get().getBalance().getAmount();
     }
 
     @Override
