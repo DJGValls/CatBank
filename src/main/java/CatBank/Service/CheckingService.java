@@ -1,9 +1,9 @@
 package CatBank.Service;
 
 import CatBank.Model.Checking;
-import CatBank.Model.User.AccountHolder;
 import CatBank.Model.User.DTO.CheckingDTO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -20,6 +20,10 @@ public interface CheckingService {
     void deleteChecking(int accountHolderId);
 
     Checking checkingFactory(CheckingDTO checkingDTO);
+
+    BigDecimal getBalance(int checkingId);
+
+    public void penaltyFeeApply(int checkingId);
 
 
 

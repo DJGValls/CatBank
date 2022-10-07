@@ -21,6 +21,8 @@ public interface AccountHolderRepository extends JpaRepository<AccountHolder, In
 
     Boolean existsByDateOfBirthIsBetween(Date dateOfBirth, Calendar instanceDate);
 
+    AccountHolder findByUserName(String userName);
+
 
 
 }

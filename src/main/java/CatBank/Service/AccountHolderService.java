@@ -28,5 +28,7 @@ public interface AccountHolderService {
 
     AccountHolder accountHolderFactory(AccountHolder accountHolder);
 
+    AccountHolder findByAccountHolderUserName(String userName);
+
 
 }

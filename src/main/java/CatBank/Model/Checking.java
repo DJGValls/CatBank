@@ -3,6 +3,8 @@ package CatBank.Model;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Utils.Money;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -12,6 +14,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "checking")
+@EntityListeners(AuditingEntityListener.class)
 public class Checking extends AbstractAccount{
 
     @Id
@@ -33,7 +36,9 @@ public class Checking extends AbstractAccount{
     private Status status;
 
     //@Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "creation_date", nullable = false)
+    @CreatedDate
+    @Nullable
+    @Column(name = "creation_date")
     private LocalDate creationDate;
 
     @Embedded
@@ -47,6 +52,9 @@ public class Checking extends AbstractAccount{
     @JoinColumn(name = "AccountHolder")
     private AccountHolder accountHolder;
 
+    private LocalDate lastMaintenanceFee;
+
+
     public Checking() {
         super();
     }
@@ -56,9 +64,10 @@ public class Checking extends AbstractAccount{
         this.secretKey = secretKey;
         this.minBalance = new Money(new BigDecimal(250));
         this.status = status;
-        this.creationDate = LocalDate.now();
+        this.creationDate = LocalDate.of(2022,01,01);
         this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.accountHolder = accountHolder;
+        this.lastMaintenanceFee = LocalDate.of(2022,01,01);
     }
     public int getCheckingId() {
         return checkingId;
@@ -112,4 +121,11 @@ public class Checking extends AbstractAccount{
         this.accountHolder = accountHolder;
     }
 
+    public LocalDate getLastMaintenanceFee() {
+        return lastMaintenanceFee;
+    }
+
+    public void setLastMaintenanceFee(LocalDate lastMaintenanceFee) {
+        this.lastMaintenanceFee = lastMaintenanceFee;
+    }
 }

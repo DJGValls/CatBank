@@ -1,16 +1,12 @@
 package CatBank.Model.User;
 
-import CatBank.Model.Checking;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "accountHolder")
@@ -32,21 +28,23 @@ public class AccountHolder {
     //@Temporal(TemporalType.DATE)
     private LocalDate dateOfBirth;
 
-    @NotBlank
-    private String address;
+    @Embedded
+    @Nullable
+    private AccountHolderAddress address;
 
-    @NotBlank
+    @Nullable
     private String email;
 
 
 
-    public AccountHolder(String userName, String password, LocalDate dateOfBirth, String address, String email) {
+    public AccountHolder(String userName, String password, LocalDate dateOfBirth, AccountHolderAddress address, String email) {
         this.userName = userName;
         this.password = password;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.email = email;
     }
+
 
     public AccountHolder() {
 
@@ -75,7 +73,7 @@ public class AccountHolder {
         return dateOfBirth;
     }
 
-    public String getAddress() {
+    public AccountHolderAddress getAddress() {
         return address;
     }
 
@@ -97,7 +95,7 @@ public class AccountHolder {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(AccountHolderAddress address) {
         this.address = address;
     }
 

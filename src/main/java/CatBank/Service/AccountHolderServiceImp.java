@@ -70,5 +70,12 @@ public class AccountHolderServiceImp implements AccountHolderService{
 
     }
 
+    @Override
+    public AccountHolder findByAccountHolderUserName(String userName) {
+        return accountHolderRepository.findByUserName(userName);
+    }
+
+
+
 
 }
