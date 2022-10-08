@@ -93,8 +93,10 @@ public class CheckingServiceImp implements CheckingService{
         Optional<Checking> originAccount = checkingRepository.findById(transferenceDTO.getOriginId());
         Optional<Checking> destinyAccount = checkingRepository.findById(transferenceDTO.getDestinyId());
 
-        if (originAccount.isPresent()||originAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getOriginName())){
-            if (destinyAccount.isPresent()||destinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
+        if (originAccount.isPresent()
+                ||originAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getOriginName())){
+            if (destinyAccount.isPresent()||
+                    destinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
                 if (transferenceDTO.getAmount().compareTo(originAccount.get().getBalance().getAmount()) > -1){
                     return new ResponseEntity<>(new MensajeDTO("No puede transferir más dinero del que tiene en su cuenta"), HttpStatus.BAD_REQUEST);
                 }else
@@ -106,6 +108,11 @@ public class CheckingServiceImp implements CheckingService{
             } else return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
         } else return new ResponseEntity(new MensajeDTO("No existe esa cuenta de origen"), HttpStatus.NOT_FOUND);
 
+    }
+
+    @Override
+    public String findByAccountHolderUserName(String userName) {
+        return checkingRepository.findByAccountHolderUserName(userName);
     }
 
 

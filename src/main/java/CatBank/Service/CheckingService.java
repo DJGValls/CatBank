@@ -28,6 +28,8 @@ public interface CheckingService {
 
     Object transferMoneyBetweenCheckings(TransferenceDTO transferenceDTO);
 
+    String findByAccountHolderUserName(String userName);
+
 
 
 
