@@ -30,6 +30,8 @@ public interface CheckingService {
 
     String findByAccountHolderUserName(String userName);
 
+    Checking updateChecking(int chekingId, CheckingDTO checkingDTO);
+
 
 
 

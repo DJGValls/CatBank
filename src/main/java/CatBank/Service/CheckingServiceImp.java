@@ -7,6 +7,7 @@ import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Repository.CheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Utils.Money;
+import org.hibernate.annotations.Check;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -109,10 +110,16 @@ public class CheckingServiceImp implements CheckingService{
         } else return new ResponseEntity(new MensajeDTO("No existe esa cuenta de origen"), HttpStatus.NOT_FOUND);
 
     }
-
     @Override
     public String findByAccountHolderUserName(String userName) {
         return checkingRepository.findByAccountHolderUserName(userName);
+    }
+
+    @Override
+    public Checking updateChecking(int chekingId, CheckingDTO checkingDTOSecundaryOwner) {
+        Checking storedChecking = checkingRepository.findById(chekingId).get();
+        storedChecking.setSecundaryOwner(checkingDTOSecundaryOwner.getSecundaryOwner());
+        return checkingRepository.save(storedChecking);
     }
 
 

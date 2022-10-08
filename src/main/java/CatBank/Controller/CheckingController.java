@@ -1,5 +1,6 @@
 package CatBank.Controller;
 
+import CatBank.Model.Checking;
 import CatBank.Model.DTO.CheckingDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.User.AccountHolder;
@@ -23,7 +24,8 @@ import javax.validation.Valid;
 import java.math.BigDecimal;
 
 @RestController
-//@RequestMapping("/accountHolder")
+@RequestMapping("/checking")
+@CrossOrigin
 public class CheckingController {
 
     @Autowired
@@ -52,13 +54,13 @@ public class CheckingController {
 
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @GetMapping("/checking/balance/{checkingId}")
+    @GetMapping("/balance/{checkingId}")
     public BigDecimal getBalance(@PathVariable(value = "checkingId") int checkingId){
         return checkingService.allFeeApplycations(checkingId);
 }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @PostMapping("checking/transferenceBetweenCheckings/")
+    @PostMapping("/transferenceBetweenCheckings/")
     public Object transferMoneyBetweenCheckings(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
@@ -66,19 +68,30 @@ public class CheckingController {
         return checkingService.transferMoneyBetweenCheckings(transferenceDTO);
     }
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")//para borrar un Checking, solo un accountholder puede hacerlo
-    @DeleteMapping("checking/deleteChecking/{checkingId}")
+    @DeleteMapping("/deleteChecking/{checkingId}")
     public ResponseEntity<?> deleteChecking(@PathVariable("checkingId") int checkingId, @RequestBody AccountHolder accountHolder){
         if (!checkingService.existsByAccountHolderId(checkingId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         if (!accountHolderService.existsByUserName(accountHolder.getUserName())){
-            return new ResponseEntity(new MensajeDTO("el usuario no existe"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new MensajeDTO("El usuario no existe"), HttpStatus.NOT_FOUND);
         }
         if (!checkingRepository.findById(checkingId).get().getAccountHolder().getUserName().equals(accountHolder.getUserName())){
-            return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece, no puede borrarla"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece, no puede borrarla"), HttpStatus.BAD_REQUEST);
         }
         checkingService.deleteChecking(checkingId);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PatchMapping("/updateChecking/{checkingId}")
+    public ResponseEntity<?> udateChecking(@PathVariable("checkingId") int checkingId, @RequestBody CheckingDTO checkingDTOSecundaryOwner){
+        if (!checkingService.existsByAccountHolderId(checkingId)) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        checkingService.updateChecking(checkingId,checkingDTOSecundaryOwner);
+        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
+    }
+
 
 }
