@@ -1,7 +1,8 @@
 package CatBank.Service;
 
 import CatBank.Model.Checking;
-import CatBank.Model.User.DTO.CheckingDTO;
+import CatBank.Model.DTO.CheckingDTO;
+import CatBank.Model.DTO.TransferenceDTO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,9 +22,13 @@ public interface CheckingService {
 
     Checking checkingFactory(CheckingDTO checkingDTO);
 
-    void feeApplycations(int checkingId);
+    BigDecimal allFeeApplycations(int checkingId);
 
-    public void penaltyFeeApply(int checkingId);
+    void penaltyFeeApply(int checkingId);
+
+    Object transferMoneyBetweenCheckings(TransferenceDTO transferenceDTO);
+
+
 
 
 

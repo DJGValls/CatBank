@@ -64,10 +64,10 @@ public class Checking extends AbstractAccount{
         this.secretKey = secretKey;
         this.minBalance = new Money(new BigDecimal(250));
         this.status = status;
-        this.creationDate = LocalDate.of(2022,01,01);
+        this.creationDate = LocalDate.now();
         this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.accountHolder = accountHolder;
-        this.lastMaintenanceFee = LocalDate.of(2022,01,01);
+        this.lastMaintenanceFee = LocalDate.now();
     }
     public int getCheckingId() {
         return checkingId;

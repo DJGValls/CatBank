@@ -2,7 +2,7 @@ package CatBank.Controller;
 
 import CatBank.Model.Checking;
 import CatBank.Model.User.AccountHolder;
-import CatBank.Model.User.DTO.CheckingDTO;
+import CatBank.Model.DTO.CheckingDTO;
 import CatBank.Security.DTO.JwtDTO;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Security.DTO.NewUserDTO;
@@ -26,7 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

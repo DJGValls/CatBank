@@ -1,4 +1,4 @@
-package CatBank.Model.User.DTO;
+package CatBank.Model.DTO;
 
 public class MoneyDTO {
 

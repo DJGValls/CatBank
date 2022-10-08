@@ -1,11 +1,10 @@
-package CatBank.Model.User.DTO;
+package CatBank.Model.DTO;
 
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 public class CheckingDTO {
 

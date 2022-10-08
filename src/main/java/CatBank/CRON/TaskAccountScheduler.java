@@ -1,6 +1,7 @@
 package CatBank.CRON;
 
 import CatBank.Model.Checking;
+import CatBank.Repository.CheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Service.CheckingService;
 import CatBank.Utils.Money;
@@ -12,20 +13,28 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
+
 @Component
 public class TaskAccountScheduler {
 
     @Autowired
     CheckingService checkingService;
 
+    @Autowired
+    CheckingRepository checkingRepository;
+
     @Scheduled(cron = "*/10 * * * * *")
     public void scheduledTaskCheckingsFees(){
 
-        long now = System.currentTimeMillis()/1000;
-        System.out.println("schedule task using cron jobs" + now);
-        //checkingService.feeApplycations()
-
+        List<Checking> checkingsList = new ArrayList<>(checkingService.checkingsList());
+        for(Checking checking1 : checkingsList) {
+            while(LocalDate.now().isAfter(checking1.getLastMaintenanceFee().plusMonths(1))){
+                checking1.setLastMaintenanceFee(checking1.getLastMaintenanceFee().plusMonths(1));
+                checking1.setBalance(new Money(checking1.getBalance().decreaseAmount(checking1.getMonthlyMaintenanceFee().getAmount())));
+                checkingService.penaltyFeeApply(checking1.getCheckingId());
+                checkingRepository.save(checking1);
+            }
+        }
     }
-
 }
