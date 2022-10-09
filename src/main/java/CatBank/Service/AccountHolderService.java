@@ -1,6 +1,7 @@
 package CatBank.Service;
 
 import CatBank.Model.User.AccountHolder;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -28,6 +29,8 @@ public interface AccountHolderService {
     AccountHolder accountHolderFactory(AccountHolder accountHolder);
 
     AccountHolder findByAccountHolderUserName(String userName);
+
+    ResponseEntity<?> createAccountHolder(AccountHolder accountHolder);
 
 
 }

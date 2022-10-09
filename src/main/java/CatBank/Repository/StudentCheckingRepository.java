@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudentCheckingRepository extends JpaRepository<StudentChecking, Integer> {
+    boolean existsByPrimaryOwner(String primaryOwner);
+
+    String findByAccountHolderUserName(String accountHolderUsername);
+
 }

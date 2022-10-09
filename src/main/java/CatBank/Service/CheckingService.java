@@ -3,6 +3,8 @@ package CatBank.Service;
 import CatBank.Model.Checking;
 import CatBank.Model.DTO.CheckingDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.User.AccountHolder;
+import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,7 +32,9 @@ public interface CheckingService {
 
     String findByAccountHolderUserName(String userName);
 
-    Checking updateChecking(int chekingId, CheckingDTO checkingDTO);
+    Checking updateChecking(int checkingId, CheckingDTO checkingDTO);
+
+    ResponseEntity<?> createChecking(CheckingDTO checkingDTO);
 
 
 

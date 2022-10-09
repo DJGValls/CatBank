@@ -80,7 +80,7 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
-        if (userService.existsByUserName(newUserDTO.getUserName())) {
+       if (userService.existsByUserName(newUserDTO.getUserName())) {
             return new ResponseEntity<>(new MensajeDTO("El nombre introducido existe o es incorrecto"), HttpStatus.BAD_REQUEST);
         }
         User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));
@@ -92,6 +92,7 @@ public class AuthController {
             return new ResponseEntity<>(new MensajeDTO("admin ha de estar presente en su nombre de usuario"), HttpStatus.BAD_REQUEST);
         user.setRoles(roles);
         userService.save(user);
+
         return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
     }
 
@@ -126,27 +127,9 @@ public class AuthController {
     @PostMapping("/newUserAccountHolder")//para crear una accountholder, solo un admin con su token puede hacerlo
     public ResponseEntity<?> newUserAccountHolder(@Valid @RequestBody AccountHolder accountHolder, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+            new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
-        if (userService.existsByUserName(accountHolder.getUserName())) {
-            return new ResponseEntity<>(new MensajeDTO(accountHolder.getUserName() + " está en uso, cambie su nombre de usario"), HttpStatus.BAD_REQUEST);
-        }
-        if (accountHolderService.existByEmail(accountHolder.getEmail())){
-            return new ResponseEntity<>(new MensajeDTO(accountHolder.getEmail() + " ya está en uso"), HttpStatus.BAD_REQUEST);
-        }
-        if (!accountHolder.getEmail().matches("^(.+)@(\\S+)$")){
-            return new ResponseEntity<>(new MensajeDTO(" el formato de Email debería ser xxx@yyy.zzz"), HttpStatus.BAD_REQUEST);
-        }
-        User user = new User(accountHolder.getUserName(), passwordEncoder.encode(accountHolder.getPassword()));
-        Set<Role> roles = new HashSet<>();
-        roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
-        if (accountHolder.getUserName().contains("admin"))
-            return new ResponseEntity<>(new MensajeDTO("nombre de usuario no puede contener la palabra admin, pruebe una vez más"), HttpStatus.BAD_REQUEST);
-        user.setRoles(roles);
-        userService.save(user);
-
-        accountHolderService.accountHolderFactory(accountHolder);
-        return new ResponseEntity<>(new MensajeDTO("Usuario AccountHolder Creado"), HttpStatus.CREATED);
+        return accountHolderService.createAccountHolder(accountHolder);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un accountholder, solo un admin puede hacerlo
     @DeleteMapping("/deleteAccountHolder/{accountHolderId}")
@@ -163,25 +146,7 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
-        if (!accountHolderService.existsByAccountHolderId(checkingDTO.getAccountHolder().getAccountHolderId())||
-                !accountHolderService.existByEmail(checkingDTO.getAccountHolder().getEmail())||
-                !accountHolderService.existsByUserName(checkingDTO.getAccountHolder().getUserName())){
-            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " no existe, revise si ha sido creado y que su id y sus datos estén correctos"), HttpStatus.BAD_REQUEST);
-        }
-        if (checkingService.existsByPrimaryOwner(checkingDTO.getPrimaryOwner())){
-            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
-        }
-        if (!checkingDTO.getAccountHolder().getUserName().equals(checkingDTO.getPrimaryOwner())){
-            return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
-        }
-        LocalDate start = LocalDate.from(checkingDTO.getAccountHolder().getDateOfBirth());
-        LocalDate end = LocalDate.now();
-        long years = ChronoUnit.YEARS.between(start, end);
-        if(years < 24){
-            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " es menor de 24 años, solo las cuentas StudentChecking están disponibles para ese rango de edad" ), HttpStatus.BAD_REQUEST);
-        }
-        checkingService.checkingFactory(checkingDTO);
-        return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
+        return checkingService.createChecking(checkingDTO);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un Checking, solo un admin puede hacerlo
     @DeleteMapping("/deleteChecking/{checkingId}")

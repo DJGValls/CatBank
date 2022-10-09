@@ -7,7 +7,6 @@ import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Repository.CheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Utils.Money;
-import org.hibernate.annotations.Check;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +25,12 @@ import java.util.Optional;
 public class CheckingServiceImp implements CheckingService{
 
     @Autowired
-    private CheckingRepository checkingRepository;
+    CheckingRepository checkingRepository;
+    @Autowired
+    AccountHolderService accountHolderService;
+
+    @Autowired
+    StudentCheckingService studentCheckingService;
 
 
     @Override
@@ -50,7 +55,6 @@ public class CheckingServiceImp implements CheckingService{
     @Override
     public void deleteChecking(int accountHolderId) {
         checkingRepository.deleteById(accountHolderId);
-
     }
 
     @Override
@@ -108,7 +112,6 @@ public class CheckingServiceImp implements CheckingService{
                 return new ResponseEntity(new MensajeDTO("el dinero ha sido transferido correctamente, su saldo actual es de " + originAccount.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
             } else return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
         } else return new ResponseEntity(new MensajeDTO("No existe esa cuenta de origen"), HttpStatus.NOT_FOUND);
-
     }
     @Override
     public String findByAccountHolderUserName(String userName) {
@@ -116,10 +119,34 @@ public class CheckingServiceImp implements CheckingService{
     }
 
     @Override
-    public Checking updateChecking(int chekingId, CheckingDTO checkingDTOSecundaryOwner) {
-        Checking storedChecking = checkingRepository.findById(chekingId).get();
+    public Checking updateChecking(int checkingId, CheckingDTO checkingDTOSecundaryOwner) {
+        Checking storedChecking = checkingRepository.findById(checkingId).get();
         storedChecking.setSecundaryOwner(checkingDTOSecundaryOwner.getSecundaryOwner());
         return checkingRepository.save(storedChecking);
+    }
+
+    @Override
+    public ResponseEntity<?> createChecking(CheckingDTO checkingDTO) {
+        if (!accountHolderService.existsByAccountHolderId(checkingDTO.getAccountHolder().getAccountHolderId())||
+                !accountHolderService.existByEmail(checkingDTO.getAccountHolder().getEmail())||
+                !accountHolderService.existsByUserName(checkingDTO.getAccountHolder().getUserName())){
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " no existe, revise si ha sido creado y que su id y sus datos estén correctos"), HttpStatus.BAD_REQUEST);
+        }
+        if (existsByPrimaryOwner(checkingDTO.getPrimaryOwner())){
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
+        }
+        if (!checkingDTO.getAccountHolder().getUserName().equals(checkingDTO.getPrimaryOwner())){
+            return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
+        }
+        LocalDate start = LocalDate.from(checkingDTO.getAccountHolder().getDateOfBirth());
+        LocalDate end = LocalDate.now();
+        long years = ChronoUnit.YEARS.between(start, end);
+        if(years < 24){
+
+            return studentCheckingService.createStudentChecking(checkingDTO);
+        }
+        checkingFactory(checkingDTO);
+        return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
     }
 
 
