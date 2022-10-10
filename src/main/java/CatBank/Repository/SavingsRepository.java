@@ -6,4 +6,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SavingsRepository extends JpaRepository<Savings, Integer> {
+
+    boolean existsByPrimaryOwner(String primaryOwner);
+
+    String findByAccountHolderUserName(String accountHolderUserName);
+
+
 }

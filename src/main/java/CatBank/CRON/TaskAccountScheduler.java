@@ -1,9 +1,11 @@
 package CatBank.CRON;
 
 import CatBank.Model.Checking;
+import CatBank.Model.Savings;
 import CatBank.Repository.CheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Service.CheckingService;
+import CatBank.Service.SavingsService;
 import CatBank.Utils.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,9 @@ public class TaskAccountScheduler {
     @Autowired
     CheckingRepository checkingRepository;
 
+    @Autowired
+    SavingsService savingsService;
+
     @Scheduled(cron = "*/10 * * * * *")
     public void scheduledTaskCheckingsFees(){
 
@@ -37,4 +42,21 @@ public class TaskAccountScheduler {
             }
         }
     }
+    @Scheduled(cron = "*/60 * * * * *")
+    public void scheduledTaskSavingsFeesAndInterestRate(){
+
+        List<Savings> savingsList = new ArrayList<>(savingsService.savingsList());
+        for(Savings storedSavings : savingsList) {
+            while(LocalDate.now().isAfter(storedSavings.getLastMaintenanceAccount().plusMonths(12))){
+                storedSavings.setLastMaintenanceAccount(storedSavings.getLastMaintenanceAccount().plusMonths(12));
+                storedSavings.setBalance(new Money(storedSavings.getBalance().increaseAmount(((storedSavings.getInterestRate().getAmount()).multiply(storedSavings.getBalance().getAmount()).divide(BigDecimal.valueOf(100))))));
+
+                if (storedSavings.getBalance().getAmount().compareTo(storedSavings.getMinBalance().getAmount())==-1) {
+                    storedSavings.getBalance().decreaseAmount(storedSavings.getPenaltyFee().getAmount());
+                }savingsService.save(storedSavings);
+            }savingsService.save(storedSavings);
+
+        }
+    }
+
 }

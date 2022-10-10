@@ -1,16 +1,37 @@
 package CatBank.Service;
 
-import CatBank.Repository.SavingsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import CatBank.Model.Checking;
+import CatBank.Model.DTO.FactoryAccountDTO;
+import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.Savings;
+import CatBank.Model.User.AccountHolder;
+import org.springframework.http.ResponseEntity;
 
-import javax.transaction.Transactional;
+import java.util.List;
 
 
-@Transactional
-public class SavingsService {
+public interface SavingsService {
 
-    @Autowired
-    SavingsRepository savingsRepository;
+    Savings save(Savings savings);
+
+    List<Savings> savingsList();
+
+    boolean existsByPrimaryOwner(String primaryOwner);
+
+    boolean existsByAccountHolderId(int accountHolderId);
+
+    ResponseEntity deleteSavings(int savingsId, AccountHolder accountHolder);
+
+    Savings savingsFactory(FactoryAccountDTO factoryAccountDTO);
+
+    ResponseEntity allFeeAndInterestRestApplycations(int savingsId);
+
+    Object SavingsTransferMoney(TransferenceDTO transferenceDTO);
+
+    String findByAccountHolderUserName(String userName);
+
+    Savings updateSavings(int savingsId, FactoryAccountDTO factoryAccountDTO);
+
+    ResponseEntity<?> createSaving(FactoryAccountDTO factoryAccountDTO);
 
 }

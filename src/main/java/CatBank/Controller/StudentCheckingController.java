@@ -1,6 +1,6 @@
 package CatBank.Controller;
 
-import CatBank.Model.DTO.CheckingDTO;
+import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.CheckingRepository;
@@ -9,7 +9,6 @@ import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
 import CatBank.Service.AccountHolderService;
-import CatBank.Service.CheckingService;
 import CatBank.Service.StudentCheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -62,7 +61,7 @@ public class StudentCheckingController {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
-        return studentCheckingService.transferMoneyBetweenStudentCheckings(transferenceDTO);
+        return studentCheckingService.studentCheckingTransferMoney(transferenceDTO);
     }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")//para borrar un Checking, solo un accountholder puede hacerlo
@@ -73,11 +72,11 @@ public class StudentCheckingController {
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PatchMapping("/updateStudentChecking/{studentCheckingId}")
-    public ResponseEntity<?> udateChecking(@PathVariable("studentCheckingId") int studentCheckingId, @RequestBody CheckingDTO checkingDTO){
+    public ResponseEntity<?> udateChecking(@PathVariable("studentCheckingId") int studentCheckingId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!studentCheckingService.existsByAccountHolderId(studentCheckingId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
-        studentCheckingService.updateStudentChecking(studentCheckingId,checkingDTO);
+        studentCheckingService.updateStudentChecking(studentCheckingId, factoryAccountDTO);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
     }
 

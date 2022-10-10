@@ -2,11 +2,14 @@ package CatBank.Service;
 
 
 import CatBank.Model.Checking;
-import CatBank.Model.DTO.CheckingDTO;
+import CatBank.Model.CreditCard;
+import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.Enums.AccountType;
+import CatBank.Model.Savings;
+import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
-import CatBank.Repository.AccountHolderRepository;
-import CatBank.Repository.CheckingRepository;
+import CatBank.Repository.*;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Utils.Money;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,12 @@ public class CheckingServiceImp implements CheckingService{
     StudentCheckingService studentCheckingService;
     @Autowired
     AccountHolderRepository accountHolderRepository;
+    @Autowired
+    StudentCheckingRepository studentCheckingRepository;
+    @Autowired
+    SavingsRepository savingsRepository;
+    @Autowired
+    CreditCardRepository creditCardRepository;
 
 
     @Override
@@ -71,15 +80,15 @@ public class CheckingServiceImp implements CheckingService{
     }
 
     @Override
-    public Checking checkingFactory(CheckingDTO checkingDTO) {
-        Checking checking1 = new Checking(checkingDTO.getPrimaryOwner(),
-                checkingDTO.getSecundaryOwner(),
-                new Money(new BigDecimal(checkingDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
-                        Currency.getInstance(checkingDTO.getBalance().getCurrencyCode())),
-                checkingDTO.getSecretKey(),
-                checkingDTO.getStatus(),
-                checkingDTO.getAccountHolder());
-        return checkingRepository.save(checking1);
+    public Checking checkingFactory(FactoryAccountDTO factoryAccountDTO) {
+        Checking checking1 = new Checking(factoryAccountDTO.getPrimaryOwner(),
+                factoryAccountDTO.getSecundaryOwner(),
+                new Money(new BigDecimal(factoryAccountDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
+                        Currency.getInstance(factoryAccountDTO.getBalance().getCurrencyCode())),
+                factoryAccountDTO.getSecretKey(),
+                factoryAccountDTO.getStatus(),
+                factoryAccountDTO.getAccountHolder());
+        return save(checking1);
     }
 
     @Override
@@ -90,7 +99,7 @@ public class CheckingServiceImp implements CheckingService{
                 checkin1.get().setLastMaintenanceFee(checkin1.get().getLastMaintenanceFee().plusMonths(1));
                 checkin1.get().setBalance(new Money(checkin1.get().getBalance().decreaseAmount(checkin1.get().getMonthlyMaintenanceFee().getAmount())));
                 penaltyFeeApply(checkingId);
-                checkingRepository.save(checkin1.get());
+                save(checkin1.get());
             } return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + checkin1.get().getBalance().getAmount() + "USD"), HttpStatus.OK);
         } return new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
 
@@ -107,24 +116,57 @@ public class CheckingServiceImp implements CheckingService{
     }
 
     @Override
-    public Object transferMoneyBetweenCheckings(TransferenceDTO transferenceDTO) {
+    public Object checkingTransferMoney(TransferenceDTO transferenceDTO) {
         Optional<Checking> originAccount = checkingRepository.findById(transferenceDTO.getOriginId());
         Optional<Checking> destinyAccount = checkingRepository.findById(transferenceDTO.getDestinyId());
+        Optional<StudentChecking> studentCheckingDestinyAccount = studentCheckingRepository.findById(transferenceDTO.getDestinyId());
+        Optional<Savings> savingsDestinyAccount = savingsRepository.findById(transferenceDTO.getDestinyId());
+        Optional<CreditCard> creditCardDestinyAccount = creditCardRepository.findById(transferenceDTO.getDestinyId());
 
-        if (originAccount.isPresent()
-                ||originAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getOriginName())){
-            if (destinyAccount.isPresent()||
-                    destinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
-                if (transferenceDTO.getAmount().compareTo(originAccount.get().getBalance().getAmount()) > -1){
-                    return new ResponseEntity<>(new MensajeDTO("No puede transferir más dinero del que tiene en su cuenta"), HttpStatus.BAD_REQUEST);
-                }else
-                originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
-                destinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
-                checkingRepository.save(originAccount.get());
-                checkingRepository.save(destinyAccount.get());
-                return new ResponseEntity(new MensajeDTO("el dinero ha sido transferido correctamente, su saldo actual es de " + originAccount.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
-            } else return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
-        } else return new ResponseEntity(new MensajeDTO("No existe esa cuenta de origen"), HttpStatus.NOT_FOUND);
+        if (!originAccount.isPresent() || !originAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getOriginName())){
+            return new ResponseEntity(new MensajeDTO("No existe esa cuenta de origen"), HttpStatus.NOT_FOUND);
+        }
+
+        if (transferenceDTO.getAmount().compareTo(originAccount.get().getBalance().getAmount()) > -1){
+            return new ResponseEntity<>(new MensajeDTO("No puede transferir más dinero del que tiene en su cuenta"), HttpStatus.BAD_REQUEST);
+        }
+        if (transferenceDTO.getDestinyAccountType().equals(AccountType.CHECKING)){
+            if (!destinyAccount.isPresent() || !destinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
+                return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
+            }
+            originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
+            destinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
+            checkingRepository.save(originAccount.get());
+            checkingRepository.save(destinyAccount.get());
+        }
+        if (transferenceDTO.getDestinyAccountType().equals(AccountType.STUDENTCHECKING)){
+            if (!studentCheckingDestinyAccount.isPresent() || !studentCheckingDestinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
+                return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
+            }
+            originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
+            studentCheckingDestinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
+            checkingRepository.save(originAccount.get());
+            studentCheckingRepository.save(studentCheckingDestinyAccount.get());
+        }
+        if (transferenceDTO.getDestinyAccountType().equals(AccountType.SAVINGS)){
+            if (!savingsDestinyAccount.isPresent() || !savingsDestinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
+                return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
+            }
+            originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
+            savingsDestinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
+            checkingRepository.save(originAccount.get());
+            savingsRepository.save(savingsDestinyAccount.get());
+        }
+/*        if (transferenceDTO.getDestinyAccountType().equals(AccountType.CREDITCARD)){
+            if (!creditCardDestinyAccount.isPresent() || !creditCardDestinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
+                return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
+            }
+            originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
+            creditCardDestinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
+            checkingRepository.save(originAccount.get());
+            creditCardRepository.save(creditCardDestinyAccount.get());
+        }
+*/        return new ResponseEntity(new MensajeDTO("el dinero ha sido transferido correctamente, su saldo actual es de " + originAccount.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
     }
     @Override
     public String findByAccountHolderUserName(String userName) {
@@ -132,36 +174,36 @@ public class CheckingServiceImp implements CheckingService{
     }
 
     @Override
-    public Checking updateChecking(int checkingId, CheckingDTO checkingDTOSecundaryOwner) {
+    public Checking updateChecking(int checkingId, FactoryAccountDTO factoryAccountDTOSecundaryOwner) {
         Checking storedChecking = checkingRepository.findById(checkingId).get();
-        storedChecking.setSecundaryOwner(checkingDTOSecundaryOwner.getSecundaryOwner());
-        return checkingRepository.save(storedChecking);
+        storedChecking.setSecundaryOwner(factoryAccountDTOSecundaryOwner.getSecundaryOwner());
+        return save(storedChecking);
     }
 
     @Override
-    public ResponseEntity<?> createChecking(CheckingDTO checkingDTO) {
-        if (!accountHolderService.existsByAccountHolderId(checkingDTO.getAccountHolder().getAccountHolderId())||
-                !accountHolderService.existByEmail(checkingDTO.getAccountHolder().getEmail())||
-                !accountHolderService.existsByUserName(checkingDTO.getAccountHolder().getUserName())){
-            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " no existe, revise si ha sido creado y que su id y sus datos estén correctos"), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> createChecking(FactoryAccountDTO factoryAccountDTO) {
+        if (!accountHolderService.existsByAccountHolderId(factoryAccountDTO.getAccountHolder().getAccountHolderId())||
+                !accountHolderService.existByEmail(factoryAccountDTO.getAccountHolder().getEmail())||
+                !accountHolderService.existsByUserName(factoryAccountDTO.getAccountHolder().getUserName())){
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + factoryAccountDTO.getAccountHolder().getUserName() + " no existe, revise si ha sido creado y que su id y sus datos estén correctos"), HttpStatus.BAD_REQUEST);
         }
-        if (existsByPrimaryOwner(checkingDTO.getPrimaryOwner())){
-            return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
+        if (existsByPrimaryOwner(factoryAccountDTO.getPrimaryOwner())){
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + factoryAccountDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
         }
-        if (!checkingDTO.getAccountHolder().getUserName().equals(checkingDTO.getPrimaryOwner())){
+        if (!factoryAccountDTO.getAccountHolder().getUserName().equals(factoryAccountDTO.getPrimaryOwner())){
             return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
         }
-        if (!accountHolderRepository.findById(checkingDTO.getAccountHolder().getAccountHolderId()).get().getUserName().equals(checkingDTO.getAccountHolder().getUserName())){
-            return new ResponseEntity<>(new MensajeDTO("El Id de usuario de " + checkingDTO.getPrimaryOwner() + " no es correcto"), HttpStatus.BAD_REQUEST);
+        if (!accountHolderRepository.findById(factoryAccountDTO.getAccountHolder().getAccountHolderId()).get().getUserName().equals(factoryAccountDTO.getAccountHolder().getUserName())){
+            return new ResponseEntity<>(new MensajeDTO("El Id de usuario de " + factoryAccountDTO.getPrimaryOwner() + " no es correcto"), HttpStatus.BAD_REQUEST);
         }
-        LocalDate start = LocalDate.from(checkingDTO.getAccountHolder().getDateOfBirth());
+        LocalDate start = LocalDate.from(factoryAccountDTO.getAccountHolder().getDateOfBirth());
         LocalDate end = LocalDate.now();
         long years = ChronoUnit.YEARS.between(start, end);
         if(years < 24){
 
-            return studentCheckingService.createStudentChecking(checkingDTO);
+            return studentCheckingService.createStudentChecking(factoryAccountDTO);
         }
-        checkingFactory(checkingDTO);
+        checkingFactory(factoryAccountDTO);
         return new ResponseEntity<>(new MensajeDTO("Cuenta Checking Creada"), HttpStatus.CREATED);
     }
 

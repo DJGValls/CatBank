@@ -1,7 +1,7 @@
 package CatBank.Service;
 
 import CatBank.Model.Checking;
-import CatBank.Model.DTO.CheckingDTO;
+import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.User.AccountHolder;
 import org.springframework.http.ResponseEntity;
@@ -21,19 +21,19 @@ public interface CheckingService {
 
     ResponseEntity deleteChecking(int checkingId, AccountHolder accountHolder);
 
-    Checking checkingFactory(CheckingDTO checkingDTO);
+    Checking checkingFactory(FactoryAccountDTO factoryAccountDTO);
 
     ResponseEntity allFeeApplycations(int checkingId);
 
     void penaltyFeeApply(int checkingId);
 
-    Object transferMoneyBetweenCheckings(TransferenceDTO transferenceDTO);
+    Object checkingTransferMoney(TransferenceDTO transferenceDTO);
 
     String findByAccountHolderUserName(String userName);
 
-    Checking updateChecking(int checkingId, CheckingDTO checkingDTO);
+    Checking updateChecking(int checkingId, FactoryAccountDTO factoryAccountDTO);
 
-    ResponseEntity<?> createChecking(CheckingDTO checkingDTO);
+    ResponseEntity<?> createChecking(FactoryAccountDTO factoryAccountDTO);
 
 
 

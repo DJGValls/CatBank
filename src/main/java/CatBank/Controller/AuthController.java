@@ -2,7 +2,7 @@ package CatBank.Controller;
 
 import CatBank.Model.Checking;
 import CatBank.Model.User.AccountHolder;
-import CatBank.Model.DTO.CheckingDTO;
+import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Security.DTO.JwtDTO;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Security.DTO.NewUserDTO;
@@ -29,8 +29,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -142,11 +140,11 @@ public class AuthController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/createChecking")//para crear una cuenta checking, solo un Admin puede hacerlo
-    public ResponseEntity<?> createChecking(@Valid @RequestBody CheckingDTO checkingDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> createChecking(@Valid @RequestBody FactoryAccountDTO factoryAccountDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
-        return checkingService.createChecking(checkingDTO);
+        return checkingService.createChecking(factoryAccountDTO);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un Checking, solo un admin puede hacerlo
     @DeleteMapping("/deleteChecking/{checkingId}")

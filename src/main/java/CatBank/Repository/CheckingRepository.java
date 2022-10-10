@@ -15,10 +15,4 @@ public interface CheckingRepository extends JpaRepository<Checking, Integer> {
     String findByAccountHolderUserName(String accountHolderUsername);
 
 
-
-
-
-
-
-
 }

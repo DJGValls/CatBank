@@ -6,7 +6,7 @@ import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 
-public class CheckingDTO {
+public class FactoryAccountDTO {
 
 
     @NotNull
@@ -23,7 +23,7 @@ public class CheckingDTO {
     private AccountHolder accountHolder;
 
 
-    public CheckingDTO() {
+    public FactoryAccountDTO() {
     }
 
     public String getPrimaryOwner() {

@@ -1,5 +1,6 @@
 package CatBank.Model;
 
+import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Utils.Money;
@@ -54,6 +55,10 @@ public class Checking extends AbstractAccount{
 
     private LocalDate lastMaintenanceFee;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
+
 
     public Checking() {
         super();
@@ -68,6 +73,7 @@ public class Checking extends AbstractAccount{
         this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.accountHolder = accountHolder;
         this.lastMaintenanceFee = LocalDate.now();
+        this.accountType = AccountType.CHECKING;
     }
     public int getCheckingId() {
         return checkingId;
@@ -127,5 +133,13 @@ public class Checking extends AbstractAccount{
 
     public void setLastMaintenanceFee(LocalDate lastMaintenanceFee) {
         this.lastMaintenanceFee = lastMaintenanceFee;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
     }
 }

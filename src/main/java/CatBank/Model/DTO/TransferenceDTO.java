@@ -1,5 +1,7 @@
 package CatBank.Model.DTO;
 
+import CatBank.Model.Enums.AccountType;
+
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -15,6 +17,8 @@ public class TransferenceDTO {
     private Integer destinyId;
     @NotNull
     private String destinyName;
+    @NotNull
+    private AccountType destinyAccountType;
 
 
     public TransferenceDTO() {
@@ -58,5 +62,13 @@ public class TransferenceDTO {
 
     public void setDestinyId(Integer destinyId) {
         this.destinyId = destinyId;
+    }
+
+    public AccountType getDestinyAccountType() {
+        return destinyAccountType;
+    }
+
+    public void setDestinyAccountType(AccountType destinyAccountType) {
+        this.destinyAccountType = destinyAccountType;
     }
 }

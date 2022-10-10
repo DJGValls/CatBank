@@ -1,5 +1,6 @@
 package CatBank.Model;
 
+import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Utils.Money;
@@ -33,6 +34,10 @@ public class StudentChecking extends AbstractAccount{
     @JoinColumn(name = "AccountHolder")
     private AccountHolder accountHolder;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
+
 
     public StudentChecking() {
 
@@ -44,6 +49,7 @@ public class StudentChecking extends AbstractAccount{
         this.status = status;
         this.creationDate = LocalDate.now();
         this.accountHolder = accountHolder;
+        this.accountType = AccountType.STUDENTCHECKING;
     }
 
     public int getStudentCheckingId() {
@@ -80,5 +86,13 @@ public class StudentChecking extends AbstractAccount{
 
     public void setAccountHolder(AccountHolder accountHolder) {
         this.accountHolder = accountHolder;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
     }
 }
