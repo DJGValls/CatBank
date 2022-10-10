@@ -6,7 +6,6 @@ import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.User.AccountHolder;
 import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -20,11 +19,11 @@ public interface CheckingService {
 
     boolean existsByAccountHolderId(int accountHolderId);
 
-    void deleteChecking(int accountHolderId);
+    ResponseEntity deleteChecking(int checkingId, AccountHolder accountHolder);
 
     Checking checkingFactory(CheckingDTO checkingDTO);
 
-    BigDecimal allFeeApplycations(int checkingId);
+    ResponseEntity allFeeApplycations(int checkingId);
 
     void penaltyFeeApply(int checkingId);
 

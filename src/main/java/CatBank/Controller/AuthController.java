@@ -153,7 +153,7 @@ public class AuthController {
     public ResponseEntity<?> deleteChecking(@PathVariable("checkingId") int checkingId){
         if (!checkingService.existsByAccountHolderId(checkingId))
             return new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
-        checkingService.deleteChecking(checkingId);
+        userService.deleteChecking(checkingId);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
     }
 

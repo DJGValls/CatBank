@@ -4,6 +4,8 @@ package CatBank.Service;
 import CatBank.Model.Checking;
 import CatBank.Model.DTO.CheckingDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.User.AccountHolder;
+import CatBank.Repository.AccountHolderRepository;
 import CatBank.Repository.CheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Utils.Money;
@@ -28,9 +30,10 @@ public class CheckingServiceImp implements CheckingService{
     CheckingRepository checkingRepository;
     @Autowired
     AccountHolderService accountHolderService;
-
     @Autowired
     StudentCheckingService studentCheckingService;
+    @Autowired
+    AccountHolderRepository accountHolderRepository;
 
 
     @Override
@@ -53,8 +56,18 @@ public class CheckingServiceImp implements CheckingService{
         return checkingRepository.existsById(accountHolderId);
     }
     @Override
-    public void deleteChecking(int accountHolderId) {
-        checkingRepository.deleteById(accountHolderId);
+    public ResponseEntity deleteChecking(int checkingId, AccountHolder accountHolder) {
+        if (!existsByAccountHolderId(checkingId)) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        if (!accountHolderService.existsByUserName(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("El usuario no existe"), HttpStatus.NOT_FOUND);
+        }
+        if (!checkingRepository.findById(checkingId).get().getAccountHolder().getUserName().equals(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece, no puede borrarla"), HttpStatus.BAD_REQUEST);
+        }
+        checkingRepository.deleteById(checkingId);
+        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
     }
 
     @Override
@@ -70,7 +83,7 @@ public class CheckingServiceImp implements CheckingService{
     }
 
     @Override
-    public BigDecimal allFeeApplycations(int checkingId) {
+    public ResponseEntity allFeeApplycations(int checkingId) {
         Optional<Checking> checkin1 = checkingRepository.findById(checkingId);
         if(checkin1.isPresent()){
             while(LocalDate.now().isAfter(checkin1.get().getLastMaintenanceFee().plusMonths(1))){
@@ -78,9 +91,9 @@ public class CheckingServiceImp implements CheckingService{
                 checkin1.get().setBalance(new Money(checkin1.get().getBalance().decreaseAmount(checkin1.get().getMonthlyMaintenanceFee().getAmount())));
                 penaltyFeeApply(checkingId);
                 checkingRepository.save(checkin1.get());
-            }
-        } new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
-        return checkin1.get().getBalance().getAmount();
+            } return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + checkin1.get().getBalance().getAmount() + "USD"), HttpStatus.OK);
+        } return new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
+
     }
 
     @Override
@@ -137,6 +150,9 @@ public class CheckingServiceImp implements CheckingService{
         }
         if (!checkingDTO.getAccountHolder().getUserName().equals(checkingDTO.getPrimaryOwner())){
             return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
+        }
+        if (!accountHolderRepository.findById(checkingDTO.getAccountHolder().getAccountHolderId()).get().getUserName().equals(checkingDTO.getAccountHolder().getUserName())){
+            return new ResponseEntity<>(new MensajeDTO("El Id de usuario de " + checkingDTO.getPrimaryOwner() + " no es correcto"), HttpStatus.BAD_REQUEST);
         }
         LocalDate start = LocalDate.from(checkingDTO.getAccountHolder().getDateOfBirth());
         LocalDate end = LocalDate.now();

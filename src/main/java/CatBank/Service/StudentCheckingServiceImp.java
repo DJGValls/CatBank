@@ -4,6 +4,7 @@ import CatBank.Model.Checking;
 import CatBank.Model.DTO.CheckingDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.StudentChecking;
+import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.StudentCheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Utils.Money;
@@ -51,8 +52,19 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
     }
 
     @Override
-    public void deleteStudentChecking(int accountHolderId) {
-        studentCheckingRepository.deleteById(accountHolderId);
+    public ResponseEntity deleteStudentChecking(int studentCheckingId, AccountHolder accountHolder){{
+        if (!existsByAccountHolderId(studentCheckingId)) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        if (!accountHolderService.existsByUserName(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("El usuario no existe"), HttpStatus.NOT_FOUND);
+        }
+        if (!studentCheckingRepository.findById(studentCheckingId).get().getAccountHolder().getUserName().equals(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece, no puede borrarla"), HttpStatus.BAD_REQUEST);
+        }
+        studentCheckingRepository.deleteById(studentCheckingId);
+        return new ResponseEntity(new MensajeDTO("La cuenta ha sido eliminada"), HttpStatus.OK);
+    }
     }
 
     @Override
@@ -94,7 +106,6 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
         storedChecking.setSecundaryOwner(checkingDTO.getSecundaryOwner());
         return studentCheckingRepository.save(storedChecking);
     }
-
     @Override
     public ResponseEntity<?> createStudentChecking(CheckingDTO checkingDTO) {
         if (!accountHolderService.existsByAccountHolderId(checkingDTO.getAccountHolder().getAccountHolderId())||
@@ -110,6 +121,13 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
         }
         studentCheckingFactory(checkingDTO);
         return new ResponseEntity<>(new MensajeDTO("El usuario " + checkingDTO.getAccountHolder().getUserName() + " es menor de 24 años, la cuenta ha sido creada como StudentChecking"), HttpStatus.CREATED);
+    }
+    @Override
+    public ResponseEntity<?> getBalance(int studentCheckingId) {
+        Optional<StudentChecking> storedStudentChecking = studentCheckingRepository.findById(studentCheckingId);
+        if (storedStudentChecking.isPresent()){
+            return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + storedStudentChecking.get().getBalance().getAmount() + "USD"), HttpStatus.OK);
+        }return new ResponseEntity(new MensajeDTO("No existe esa cuenta StudentChecking"), HttpStatus.NOT_FOUND);
     }
 
 

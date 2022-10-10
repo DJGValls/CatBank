@@ -1,6 +1,5 @@
 package CatBank.Controller;
 
-import CatBank.Model.Checking;
 import CatBank.Model.DTO.CheckingDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.User.AccountHolder;
@@ -21,7 +20,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/checking")
@@ -55,9 +53,9 @@ public class CheckingController {
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @GetMapping("/balance/{checkingId}")
-    public BigDecimal getBalance(@PathVariable(value = "checkingId") int checkingId){
+    public ResponseEntity getBalance(@PathVariable(value = "checkingId") int checkingId){
         return checkingService.allFeeApplycations(checkingId);
-}
+    }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping("/transferenceBetweenCheckings/")
@@ -70,17 +68,8 @@ public class CheckingController {
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")//para borrar un Checking, solo un accountholder puede hacerlo
     @DeleteMapping("/deleteChecking/{checkingId}")
     public ResponseEntity<?> deleteChecking(@PathVariable("checkingId") int checkingId, @RequestBody AccountHolder accountHolder){
-        if (!checkingService.existsByAccountHolderId(checkingId)) {
-            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
-        }
-        if (!accountHolderService.existsByUserName(accountHolder.getUserName())){
-            return new ResponseEntity(new MensajeDTO("El usuario no existe"), HttpStatus.NOT_FOUND);
-        }
-        if (!checkingRepository.findById(checkingId).get().getAccountHolder().getUserName().equals(accountHolder.getUserName())){
-            return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece, no puede borrarla"), HttpStatus.BAD_REQUEST);
-        }
-        checkingService.deleteChecking(checkingId);
-        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
+
+        return checkingService.deleteChecking(checkingId,accountHolder);
     }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")

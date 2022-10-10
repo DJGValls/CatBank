@@ -4,6 +4,7 @@ import CatBank.Model.Checking;
 import CatBank.Model.DTO.CheckingDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.StudentChecking;
+import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.StudentCheckingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public interface StudentCheckingService {
 
     boolean existsByAccountHolderId(int accountHolderId);
 
-    void deleteStudentChecking(int accountHolder);
+    ResponseEntity deleteStudentChecking(int studentCheckingId, AccountHolder accountHolder);
 
     StudentChecking studentCheckingFactory(CheckingDTO checkingDTO);
 
@@ -33,6 +34,8 @@ public interface StudentCheckingService {
     StudentChecking updateStudentChecking(int studentCheckingId, CheckingDTO checkingDTO);
 
     ResponseEntity<?> createStudentChecking(CheckingDTO checkingDTO);
+
+    ResponseEntity<?> getBalance(int studentCheckingId);
 
 
 }

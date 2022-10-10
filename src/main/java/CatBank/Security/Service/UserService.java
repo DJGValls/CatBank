@@ -1,5 +1,6 @@
 package CatBank.Security.Service;
 
+import CatBank.Repository.CheckingRepository;
 import CatBank.Security.DTO.JwtDTO;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Security.DTO.NewUserDTO;
@@ -32,6 +33,8 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    CheckingRepository checkingRepository;
 
 
 
@@ -61,6 +64,9 @@ public class UserService {
     }
     public void deleteUser(int userId){
         userRepository.deleteById(userId);
+    }
+    public void deleteChecking (int chekingId){
+        checkingRepository.deleteById(chekingId);
     }
 
 
