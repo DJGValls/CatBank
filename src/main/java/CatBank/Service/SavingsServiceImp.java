@@ -87,21 +87,7 @@ public class SavingsServiceImp implements SavingsService{
         return save(StoredSaving);
     }
 
-    @Override
-    public ResponseEntity allFeeAndInterestRestApplycations(int savingsId) {
-        Optional<Savings> storedSavings = savingsRepository.findById(savingsId);
-        if (storedSavings.isPresent()){
-            while(LocalDate.now().isAfter(storedSavings.get().getLastMaintenanceAccount().plusMonths(12))){
-                storedSavings.get().setLastMaintenanceAccount(storedSavings.get().getLastMaintenanceAccount().plusMonths(12));
-                storedSavings.get().setBalance(new Money(storedSavings.get().getBalance().increaseAmount(((storedSavings.get().getInterestRate().getAmount()).multiply(storedSavings.get().getBalance().getAmount()).divide(BigDecimal.valueOf(100))))));
 
-                if (storedSavings.get().getBalance().getAmount().compareTo(storedSavings.get().getMinBalance().getAmount())==-1) {
-                    storedSavings.get().getBalance().decreaseAmount(storedSavings.get().getPenaltyFee().getAmount());
-                }save(storedSavings.get());
-            }save(storedSavings.get());
-        }
-        return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + storedSavings.get().getBalance().getAmount() + "USD"), HttpStatus.OK);
-    }
 
     @Override
     public Object SavingsTransferMoney(TransferenceDTO transferenceDTO) {
@@ -145,7 +131,7 @@ public class SavingsServiceImp implements SavingsService{
             save(originAccount.get());
             save(savingsDestinyAccount.get());
         }
-/*        if (transferenceDTO.getDestinyAccountType().equals(AccountType.CREDITCARD)){
+        if (transferenceDTO.getDestinyAccountType().equals(AccountType.CREDITCARD)){
             if (!creditCardDestinyAccount.isPresent() || !creditCardDestinyAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getDestinyName())){
                 return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
             }
@@ -154,7 +140,7 @@ public class SavingsServiceImp implements SavingsService{
             save(originAccount.get());
             creditCardRepository.save(creditCardDestinyAccount.get());
         }
-*/        return new ResponseEntity(new MensajeDTO("el dinero ha sido transferido correctamente, su saldo actual es de " + originAccount.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("el dinero ha sido transferido correctamente, su saldo actual es de " + originAccount.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
     }
 
     @Override
@@ -177,7 +163,7 @@ public class SavingsServiceImp implements SavingsService{
             return new ResponseEntity<>(new MensajeDTO("El usuario " + factoryAccountDTO.getAccountHolder().getUserName() + " no existe, revise si ha sido creado y que su id y sus datos estén correctos"), HttpStatus.BAD_REQUEST);
         }
         if (existsByPrimaryOwner(factoryAccountDTO.getPrimaryOwner())){
-            return new ResponseEntity<>(new MensajeDTO("El usuario " + factoryAccountDTO.getAccountHolder().getUserName() + " ya tiene una cuenta Checking creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new MensajeDTO("El usuario " + factoryAccountDTO.getAccountHolder().getUserName() + " ya tiene una cuenta creada, revise que los datos sean correctos"), HttpStatus.BAD_REQUEST);
         }
         if (!factoryAccountDTO.getAccountHolder().getUserName().equals(factoryAccountDTO.getPrimaryOwner())){
             return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
@@ -191,6 +177,6 @@ public class SavingsServiceImp implements SavingsService{
         Optional<Savings> storedSavings = savingsRepository.findById(savingsId);
         if (storedSavings.isPresent()){
             return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + storedSavings.get().getBalance().getAmount() + "USD"), HttpStatus.OK);
-        }return new ResponseEntity(new MensajeDTO("No existe esa cuenta StudentChecking"), HttpStatus.NOT_FOUND);
+        }return new ResponseEntity(new MensajeDTO("No existe esa cuenta"), HttpStatus.NOT_FOUND);
     }
 }

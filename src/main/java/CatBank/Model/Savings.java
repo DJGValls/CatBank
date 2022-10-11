@@ -1,5 +1,6 @@
 package CatBank.Model;
 
+import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Utils.Money;
@@ -54,6 +55,10 @@ public class Savings extends AbstractAccount{
 
     private LocalDate lastMaintenanceAccount;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
+
     public Savings() {
     }
 
@@ -62,10 +67,11 @@ public class Savings extends AbstractAccount{
         this.secretKey = secretKey;
         this.minBalance = new Money(new BigDecimal(1000));
         this.status = status;
-        this.creationDate = LocalDate.of(2021, 01, 01);//LocalDate.now();
+        this.creationDate = LocalDate.now();
         this.interestRate = new Money(new BigDecimal(0.1));
         this.accountHolder = accountHolder;
-        this.lastMaintenanceAccount = LocalDate.of(2021, 01, 01);//LocalDate.now();
+        this.lastMaintenanceAccount = LocalDate.now();
+        this.accountType = AccountType.SAVINGS;
     }
 
     public int getSavingsId() {
@@ -129,5 +135,13 @@ public class Savings extends AbstractAccount{
 
     public void setLastMaintenanceAccount(LocalDate lastMaintenanceAccount) {
         this.lastMaintenanceAccount = lastMaintenanceAccount;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
     }
 }

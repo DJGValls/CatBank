@@ -6,4 +6,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CreditCardRepository extends JpaRepository<CreditCard, Integer> {
+
+    boolean existsByPrimaryOwner(String primaryOwner);
+
+    String findByAccountHolderUserName(String accountHolderUserName);
+
 }

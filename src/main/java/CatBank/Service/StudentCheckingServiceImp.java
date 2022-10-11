@@ -170,7 +170,7 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
     public ResponseEntity<?> getBalance(int studentCheckingId) {
         Optional<StudentChecking> storedStudentChecking = studentCheckingRepository.findById(studentCheckingId);
         if (storedStudentChecking.isPresent()){
-            return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + storedStudentChecking.get().getBalance().getAmount() + "USD"), HttpStatus.OK);
+            return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + storedStudentChecking.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
         }return new ResponseEntity(new MensajeDTO("No existe esa cuenta StudentChecking"), HttpStatus.NOT_FOUND);
     }
 

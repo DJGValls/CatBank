@@ -24,8 +24,6 @@ public interface SavingsService {
 
     Savings savingsFactory(FactoryAccountDTO factoryAccountDTO);
 
-    ResponseEntity allFeeAndInterestRestApplycations(int savingsId);
-
     Object SavingsTransferMoney(TransferenceDTO transferenceDTO);
 
     String findByAccountHolderUserName(String userName);

@@ -29,6 +29,6 @@ public class JwtEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException, ServletException {
         logger.error("No se ha introducido Token");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No esta autorizado");
-        new ResponseEntity<>(new MensajeDTO("El Token ha caducado, no ha sido introducido o contiene errores"), HttpStatus.BAD_REQUEST);
+        new ResponseEntity<>(new MensajeDTO("El Token ha caducado, no ha sido introducido o contiene errores"), HttpStatus.NOT_FOUND);
     }
 }
