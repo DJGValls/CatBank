@@ -1,6 +1,8 @@
 package CatBank.Controller;
 
 import CatBank.Model.Checking;
+import CatBank.Model.Savings;
+import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Security.DTO.JwtDTO;
@@ -15,6 +17,8 @@ import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
 import CatBank.Service.AccountHolderService;
 import CatBank.Service.CheckingService;
+import CatBank.Service.SavingsService;
+import CatBank.Service.StudentCheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,24 +44,22 @@ public class AuthController {
 
     @Autowired
     AccountHolderService accountHolderService;
-
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     UserService userService;
-
     @Autowired
     RoleService roleService;
-
     @Autowired
     CheckingService checkingService;
-
     @Autowired
     JwtProvider jwtProvider;
+    @Autowired
+    SavingsService savingsService;
+    @Autowired
+    StudentCheckingService studentCheckingService;
 
     @PostMapping("/login")//para obtener un token, ya sea de admin, de accountHolder o de thirdParty
     public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
@@ -72,7 +74,6 @@ public class AuthController {
         JwtDTO jwtDTO = new JwtDTO(jwt, userDetails.getUsername(), userDetails.getAuthorities());
         return new ResponseEntity<>(jwtDTO, HttpStatus.OK);
     }
-
     @PostMapping("/newAdmin")//para crear un nuevo admin, no necesitas token
     public ResponseEntity<?> newUser(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -93,7 +94,6 @@ public class AuthController {
 
         return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/newUserThirdParty")//para crear un user thirdParty, solo un admin con su token puede hacerlo
     public ResponseEntity<?> newUserThirdParty(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
@@ -120,7 +120,6 @@ public class AuthController {
         userService.deleteUser(userId);
         return new ResponseEntity(new MensajeDTO("Usuario eliminado"), HttpStatus.OK);
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/newUserAccountHolder")//para crear una accountholder, solo un admin con su token puede hacerlo
     public ResponseEntity<?> newUserAccountHolder(@Valid @RequestBody AccountHolder accountHolder, BindingResult bindingResult) {
@@ -137,7 +136,6 @@ public class AuthController {
         accountHolderService.delete(accountHolderId);
         return new ResponseEntity(new MensajeDTO("Usuario eliminado"), HttpStatus.OK);
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/createChecking")//para crear una cuenta checking, solo un Admin puede hacerlo
     public ResponseEntity<?> createChecking(@Valid @RequestBody FactoryAccountDTO factoryAccountDTO, BindingResult bindingResult) {
@@ -154,8 +152,22 @@ public class AuthController {
         userService.deleteChecking(checkingId);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
     }
-
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/createSavings")//para crear una cuenta checking, solo un Admin puede hacerlo
+    public ResponseEntity<?> createSavings(@Valid @RequestBody FactoryAccountDTO factoryAccountDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        return savingsService.createSaving(factoryAccountDTO);
+    }
+    @PreAuthorize("hasRole('ADMIN')")//para borrar un Checking, solo un admin puede hacerlo
+    @DeleteMapping("/deleteSavings/{savingsId}")
+    public ResponseEntity<?> deleteSavings(@PathVariable("savingsId") int savingsId){
+        if (!savingsService.existsByAccountHolderId(savingsId))
+            return new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
+        userService.deleteChecking(savingsId);
+        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
+    }
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/adminList")
     public List<User> listAdmins(){
@@ -179,10 +191,14 @@ public class AuthController {
     public List<Checking> checkingsList(){
         return checkingService.checkingsList();
     }
-
-
-
-
-
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/studentCheckingList")
+    public List<StudentChecking> studentCheckingsList(){
+        return studentCheckingService.studentCheckingsList();
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/savingsList")
+    public List<Savings> savingsList(){
+        return savingsService.savingsList();
+    }
 }

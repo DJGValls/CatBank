@@ -9,6 +9,7 @@ import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
 import CatBank.Service.AccountHolderService;
+import CatBank.Service.SavingsService;
 import CatBank.Service.StudentCheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/studentChecking")
+@RequestMapping("/savings")
 @CrossOrigin
-public class StudentCheckingController {
+public class SavingsController {
+
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -49,35 +51,39 @@ public class StudentCheckingController {
     @Autowired
     AccountHolderService accountHolderService;
 
+    @Autowired
+    SavingsService savingsService;
+
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @GetMapping("/balance/{studentCheckingId}")
-    public ResponseEntity getBalance(@PathVariable(value = "studentCheckingId") int studentCheckingId){
-        return studentCheckingService.getBalance(studentCheckingId);
+    @GetMapping("/balance/{savingsId}")
+    public ResponseEntity getBalance(@PathVariable(value = "savingsId") int savingsId){
+        return savingsService.getBalance(savingsId);
     }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping("/transferMoney/")
-    public Object studentCheckingTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
+    public Object savingsTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
-        return studentCheckingService.studentCheckingTransferMoney(transferenceDTO);
+        return savingsService.SavingsTransferMoney(transferenceDTO);
     }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")//para borrar un Checking, solo un accountholder puede hacerlo
-    @DeleteMapping("/deleteStudentChecking/{studentCheckingId}")
-    public ResponseEntity<?> deleteChecking(@PathVariable("studentCheckingId") int studentCheckingId, @RequestBody AccountHolder accountHolder){
-        return studentCheckingService.deleteStudentChecking(studentCheckingId,accountHolder);
+    @DeleteMapping("/deleteSavings/{savingsId}")
+    public ResponseEntity<?> deleteSavings(@PathVariable("savingsId") int savingsId, @RequestBody AccountHolder accountHolder){
+        return savingsService.deleteSavings(savingsId,accountHolder);
     }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @PatchMapping("/updateStudentChecking/{studentCheckingId}")
-    public ResponseEntity<?> udateChecking(@PathVariable("studentCheckingId") int studentCheckingId, @RequestBody FactoryAccountDTO factoryAccountDTO){
-        if (!studentCheckingService.existsByAccountHolderId(studentCheckingId)) {
+    @PatchMapping("/updateSavings/{savingsId}")
+    public ResponseEntity<?> udateSavings(@PathVariable("savingsId") int savingsId, @RequestBody FactoryAccountDTO factoryAccountDTO){
+        if (!savingsService.existsByAccountHolderId(savingsId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
-        studentCheckingService.updateStudentChecking(studentCheckingId, factoryAccountDTO);
+        savingsService.updateSavings(savingsId, factoryAccountDTO);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
     }
+
 
 }

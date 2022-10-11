@@ -43,20 +43,30 @@ public class TaskAccountScheduler {
         }
     }
     @Scheduled(cron = "*/60 * * * * *")
-    public void scheduledTaskSavingsFeesAndInterestRate(){
+    public void scheduledTaskSavingsInterestRate(){
 
         List<Savings> savingsList = new ArrayList<>(savingsService.savingsList());
         for(Savings storedSavings : savingsList) {
             while(LocalDate.now().isAfter(storedSavings.getLastMaintenanceAccount().plusMonths(12))){
                 storedSavings.setLastMaintenanceAccount(storedSavings.getLastMaintenanceAccount().plusMonths(12));
                 storedSavings.setBalance(new Money(storedSavings.getBalance().increaseAmount(((storedSavings.getInterestRate().getAmount()).multiply(storedSavings.getBalance().getAmount()).divide(BigDecimal.valueOf(100))))));
-
-                if (storedSavings.getBalance().getAmount().compareTo(storedSavings.getMinBalance().getAmount())==-1) {
-                    storedSavings.getBalance().decreaseAmount(storedSavings.getPenaltyFee().getAmount());
-                }savingsService.save(storedSavings);
             }savingsService.save(storedSavings);
-
         }
     }
+    @Scheduled(cron = "*/15 * * * * *")
+    public void scheduledTaskSavingsPenaltyFee(){
+
+        List<Savings> savingsList = new ArrayList<>(savingsService.savingsList());
+        for(Savings storedSavings : savingsList) {
+            while(LocalDate.now().isAfter(storedSavings.getLastMaintenanceAccount().plusMonths(1))) {
+                storedSavings.setLastMaintenanceAccount(storedSavings.getLastMaintenanceAccount().plusMonths(1));
+                if (storedSavings.getBalance().getAmount().compareTo(storedSavings.getMinBalance().getAmount()) == -1) {
+                    storedSavings.getBalance().decreaseAmount(storedSavings.getPenaltyFee().getAmount());
+                }
+                savingsService.save(storedSavings);
+            }
+        }
+    }
+
 
 }

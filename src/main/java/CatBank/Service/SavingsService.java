@@ -34,4 +34,6 @@ public interface SavingsService {
 
     ResponseEntity<?> createSaving(FactoryAccountDTO factoryAccountDTO);
 
+    ResponseEntity<?> getBalance(int savingsId);
+
 }

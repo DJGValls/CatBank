@@ -62,10 +62,10 @@ public class Savings extends AbstractAccount{
         this.secretKey = secretKey;
         this.minBalance = new Money(new BigDecimal(1000));
         this.status = status;
-        this.creationDate = LocalDate.now();
+        this.creationDate = LocalDate.of(2021, 01, 01);//LocalDate.now();
         this.interestRate = new Money(new BigDecimal(0.1));
         this.accountHolder = accountHolder;
-        this.lastMaintenanceAccount = LocalDate.now();
+        this.lastMaintenanceAccount = LocalDate.of(2021, 01, 01);//LocalDate.now();
     }
 
     public int getSavingsId() {
