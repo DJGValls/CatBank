@@ -1,6 +1,7 @@
 package CatBank.Controller;
 
 import CatBank.Model.Checking;
+import CatBank.Model.CreditCard;
 import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
@@ -15,10 +16,7 @@ import CatBank.Security.Model.Role;
 import CatBank.Security.Model.User;
 import CatBank.Security.Service.RoleService;
 import CatBank.Security.Service.UserService;
-import CatBank.Service.AccountHolderService;
-import CatBank.Service.CheckingService;
-import CatBank.Service.SavingsService;
-import CatBank.Service.StudentCheckingService;
+import CatBank.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,6 +58,8 @@ public class AuthController {
     SavingsService savingsService;
     @Autowired
     StudentCheckingService studentCheckingService;
+    @Autowired
+    CreditCardService creditCardService;
 
     @PostMapping("/login")//para obtener un token, ya sea de admin, de accountHolder o de thirdParty
     public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
@@ -144,14 +144,7 @@ public class AuthController {
         }
         return checkingService.createChecking(factoryAccountDTO);
     }
-    @PreAuthorize("hasRole('ADMIN')")//para borrar un Checking, solo un admin puede hacerlo
-    @DeleteMapping("/deleteChecking/{checkingId}")
-    public ResponseEntity<?> deleteChecking(@PathVariable("checkingId") int checkingId){
-        if (!checkingService.existsByAccountHolderId(checkingId))
-            return new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
-        userService.deleteChecking(checkingId);
-        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
-    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/createSavings")//para crear una cuenta checking, solo un Admin puede hacerlo
     public ResponseEntity<?> createSavings(@Valid @RequestBody FactoryAccountDTO factoryAccountDTO, BindingResult bindingResult) {
@@ -160,14 +153,7 @@ public class AuthController {
         }
         return savingsService.createSaving(factoryAccountDTO);
     }
-    @PreAuthorize("hasRole('ADMIN')")//para borrar un Checking, solo un admin puede hacerlo
-    @DeleteMapping("/deleteSavings/{savingsId}")
-    public ResponseEntity<?> deleteSavings(@PathVariable("savingsId") int savingsId){
-        if (!savingsService.existsByAccountHolderId(savingsId))
-            return new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
-        userService.deleteChecking(savingsId);
-        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido eliminada"), HttpStatus.OK);
-    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/adminList")
     public List<User> listAdmins(){
@@ -200,5 +186,10 @@ public class AuthController {
     @GetMapping("/savingsList")
     public List<Savings> savingsList(){
         return savingsService.savingsList();
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/creditCardsList")
+    public List<CreditCard> creditCardsList(){
+        return creditCardService.creditCardList();
     }
 }

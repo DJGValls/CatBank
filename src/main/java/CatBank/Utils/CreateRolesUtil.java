@@ -1,4 +1,4 @@
-package CatBank.Security.Utils;
+package CatBank.Utils;
 
 
 import CatBank.Security.Model.Enums.RoleName;

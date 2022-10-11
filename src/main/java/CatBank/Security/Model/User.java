@@ -23,15 +23,6 @@ public class User {
     @NotNull
     private String password;
 
-/*    @NotNull
-    private Date dateOfBirth;
-
-    @NotNull
-    private String address;
-    @NotNull
-    @Column(unique = true)
-    private String email;
-*/
 
     //Relación many to many
     //Un usuario puede tener MUCHOS roles y un rol puede PERTENECER a varios usuarios
@@ -48,15 +39,7 @@ public class User {
     public User() {
     }
 
-    //Constructor sin id ni rol
-/*    public User(String userName, String password, Date dateOfBirth, String address, String email) {
-        this.userName = userName;
-        this.password = password;
-        this.dateOfBirth = dateOfBirth;
-        this.address = address;
-        this.email = email;
-    }
-*/
+
     //Constuctor sin Id ni Roles
     public User(@NotNull String userName, @NotNull String password) {
         this.userName = userName;
@@ -90,29 +73,4 @@ public class User {
         this.roles = roles;
     }
 
-/*    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
- */
 }
