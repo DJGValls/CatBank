@@ -26,11 +26,10 @@ public class ThirdParty {
     @JsonIgnore
     private List<StudentChecking> studentCheckingsList;
 
-    public ThirdParty(String userName, String password, List<Checking> checkingList, List<StudentChecking> studentCheckingsList) {
+    public ThirdParty(String userName, String password) {
         this.userName = userName;
         this.password = password;
-        this.checkingList = checkingList;
-        this.studentCheckingsList = studentCheckingsList;
+
     }
 
     public ThirdParty() {

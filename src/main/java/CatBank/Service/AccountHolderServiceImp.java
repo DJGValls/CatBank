@@ -21,7 +21,6 @@ public class AccountHolderServiceImp implements AccountHolderService{
 
     @Autowired
     AccountHolderRepository accountHolderRepository;
-
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -104,10 +103,8 @@ public class AccountHolderServiceImp implements AccountHolderService{
             return new ResponseEntity<>(new MensajeDTO("nombre de usuario no puede contener la palabra admin, pruebe una vez más"), HttpStatus.BAD_REQUEST);
         user.setRoles(roles);
         userService.save(user);
-
         accountHolderFactory(accountHolder);
         return new ResponseEntity(new MensajeDTO("Usuario creado"), HttpStatus.OK);
     }
-
 
 }

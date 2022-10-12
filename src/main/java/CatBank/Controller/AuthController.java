@@ -6,6 +6,7 @@ import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Model.DTO.FactoryAccountDTO;
+import CatBank.Model.User.ThirdParty;
 import CatBank.Security.DTO.JwtDTO;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Security.DTO.NewUserDTO;
@@ -60,6 +61,8 @@ public class AuthController {
     StudentCheckingService studentCheckingService;
     @Autowired
     CreditCardService creditCardService;
+    @Autowired
+    ThirdPartyService thirdPartyService;
 
     @PostMapping("/login")//para obtener un token, ya sea de admin, de accountHolder o de thirdParty
     public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
@@ -96,21 +99,10 @@ public class AuthController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/newUserThirdParty")//para crear un user thirdParty, solo un admin con su token puede hacerlo
-    public ResponseEntity<?> newUserThirdParty(@Valid @RequestBody NewUserDTO newUserDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> newUserThirdParty(@Valid @RequestBody ThirdParty thirdParty, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
-        }
-        if (userService.existsByUserName(newUserDTO.getUserName())) {
-            return new ResponseEntity<>(new MensajeDTO("El nombre introducido es incorrecto"), HttpStatus.BAD_REQUEST);
-        }
-        User user = new User(newUserDTO.getUserName(), passwordEncoder.encode(newUserDTO.getPassword()));
-        Set<Role> roles = new HashSet<>();
-        roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
-        if (newUserDTO.getUserName().contains("admin"))
-            return new ResponseEntity<>(new MensajeDTO("nombre de usuario en uso, pruebe una vez más"), HttpStatus.BAD_REQUEST);
-        user.setRoles(roles);
-        userService.save(user);
-        return new ResponseEntity<>(new MensajeDTO("Usuario Creado"), HttpStatus.CREATED);
+        }return thirdPartyService.createThirdParty(thirdParty);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un user admin, thirdparty o accountholder. Solo un admin puede hacerlo
     @DeleteMapping("/deleteUser/{userId}")
