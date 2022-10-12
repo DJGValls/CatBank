@@ -1,9 +1,11 @@
 package CatBank.Model.DTO;
 
+import java.math.BigDecimal;
+
 public class MoneyDTO {
 
     private String currencyCode;
-    private double amount;
+    private BigDecimal amount;
 
     public String getCurrencyCode() {
         return currencyCode;
@@ -13,12 +15,12 @@ public class MoneyDTO {
         this.currencyCode = currencyCode;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-// GETTERS SETTERS ETC EQUALS
+
 }

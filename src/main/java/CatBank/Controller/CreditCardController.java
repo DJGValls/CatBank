@@ -72,8 +72,8 @@ public class CreditCardController {
         return creditCardService.deleteCreditCard(creditCardId,accountHolder);
     }
 
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @PatchMapping("/updateCreditCard/{creditCardId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/updateCreditCardBalance/{creditCardId}")
     public ResponseEntity<?> udateCreditCard(@PathVariable("creditCardId") int creditCardId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!creditCardService.existsByAccountHolderId(creditCardId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);

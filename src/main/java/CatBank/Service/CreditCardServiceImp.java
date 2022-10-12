@@ -78,7 +78,7 @@ public class CreditCardServiceImp implements CreditCardService {
     public CreditCard creditCardFactory(FactoryAccountDTO factoryAccountDTO) {
         CreditCard StoredCreditCard = new CreditCard(factoryAccountDTO.getPrimaryOwner(),
                 factoryAccountDTO.getSecundaryOwner(),
-                new Money(new BigDecimal(factoryAccountDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
+                new Money(new BigDecimal(String.valueOf(factoryAccountDTO.getBalance().getAmount()), new MathContext(6, RoundingMode.HALF_EVEN)),
                         Currency.getInstance(factoryAccountDTO.getBalance().getCurrencyCode())),
                 factoryAccountDTO.getAccountHolder());
         return save(StoredCreditCard);
@@ -144,9 +144,9 @@ public class CreditCardServiceImp implements CreditCardService {
     }
 
     @Override
-    public CreditCard updateCreditCard(int creditCardId, FactoryAccountDTO factoryAccountDTO) {
+    public CreditCard updateCreditCard(int creditCardId, FactoryAccountDTO factoryAccountDTOBalance) {
         CreditCard storedCreditCard = creditCardRepository.findById(creditCardId).get();
-        storedCreditCard.setSecundaryOwner(factoryAccountDTO.getSecundaryOwner());
+        storedCreditCard.getBalance().increaseAmount(factoryAccountDTOBalance.getBalance().getAmount());
         return save(storedCreditCard);
     }
 

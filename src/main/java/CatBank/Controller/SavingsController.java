@@ -75,8 +75,8 @@ public class SavingsController {
         return savingsService.deleteSavings(savingsId,accountHolder);
     }
 
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @PatchMapping("/updateSavings/{savingsId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/updateSavingsBalance/{savingsId}")
     public ResponseEntity<?> udateSavings(@PathVariable("savingsId") int savingsId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!savingsService.existsByAccountHolderId(savingsId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);

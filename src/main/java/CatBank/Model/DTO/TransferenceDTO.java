@@ -12,7 +12,7 @@ public class TransferenceDTO {
     private Integer originId;
     @NotNull
     private String originName;
-    @Nullable
+    @NotNull
     private Integer secretKey;
     @NotNull
     private BigDecimal amount;

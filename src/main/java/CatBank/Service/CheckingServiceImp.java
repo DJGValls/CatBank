@@ -88,7 +88,7 @@ public class CheckingServiceImp implements CheckingService{
     public Checking checkingFactory(FactoryAccountDTO factoryAccountDTO) {
         Checking checking1 = new Checking(factoryAccountDTO.getPrimaryOwner(),
                 factoryAccountDTO.getSecundaryOwner(),
-                new Money(new BigDecimal(factoryAccountDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
+                new Money(new BigDecimal(String.valueOf(factoryAccountDTO.getBalance().getAmount()), new MathContext(6, RoundingMode.HALF_EVEN)),
                         Currency.getInstance(factoryAccountDTO.getBalance().getCurrencyCode())),
                 factoryAccountDTO.getSecretKey(),
                 factoryAccountDTO.getStatus(),
@@ -128,7 +128,7 @@ public class CheckingServiceImp implements CheckingService{
         Optional<Savings> savingsDestinyAccount = savingsRepository.findById(transferenceDTO.getDestinyId());
         Optional<CreditCard> creditCardDestinyAccount = creditCardRepository.findById(transferenceDTO.getDestinyId());
 
-        if (!originAccount.isPresent() || !originAccount.get().getAccountHolder().getUserName().equals(transferenceDTO.getOriginName())){
+        if (!originAccount.isPresent() || !originAccount.get().getPrimaryOwner().equals(transferenceDTO.getOriginName())){
             return new ResponseEntity(new MensajeDTO("No existe esa cuenta de origen"), HttpStatus.NOT_FOUND);
         }
 
@@ -179,9 +179,9 @@ public class CheckingServiceImp implements CheckingService{
     }
 
     @Override
-    public Checking updateChecking(int checkingId, FactoryAccountDTO factoryAccountDTOSecundaryOwner) {
+    public Checking updateChecking(int checkingId, FactoryAccountDTO factoryAccountDTOBalance) {
         Checking storedChecking = checkingRepository.findById(checkingId).get();
-        storedChecking.setSecundaryOwner(factoryAccountDTOSecundaryOwner.getSecundaryOwner());
+        storedChecking.getBalance().increaseAmount(factoryAccountDTOBalance.getBalance().getAmount());
         return save(storedChecking);
     }
 
@@ -234,7 +234,7 @@ public class CheckingServiceImp implements CheckingService{
     public Checking checkingFactoryThirdParty(ThirdPartyFactoryAccountDTO thirdPartyFactoryAccountDTO) {
         Checking checking1 = new Checking(thirdPartyFactoryAccountDTO.getPrimaryOwner(),
                 thirdPartyFactoryAccountDTO.getSecundaryOwner(),
-                new Money(new BigDecimal(thirdPartyFactoryAccountDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
+                new Money(new BigDecimal(String.valueOf(thirdPartyFactoryAccountDTO.getBalance().getAmount()), new MathContext(6, RoundingMode.HALF_EVEN)),
                         Currency.getInstance(thirdPartyFactoryAccountDTO.getBalance().getCurrencyCode())),
                 thirdPartyFactoryAccountDTO.getSecretKey(),
                 thirdPartyFactoryAccountDTO.getThirdParty());

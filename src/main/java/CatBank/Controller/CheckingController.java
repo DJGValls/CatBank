@@ -57,7 +57,7 @@ public class CheckingController {
         return checkingService.allFeeApplycations(checkingId);
     }
 
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PreAuthorize("hasRoles('ACCOUNTHOLDER', 'THRIDPARTY')")
     @PostMapping("/transferMoney/")
     public Object transferMoneyChecking(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -65,20 +65,20 @@ public class CheckingController {
         }
         return checkingService.checkingTransferMoney(transferenceDTO);
     }
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")//para borrar un Checking, solo un accountholder puede hacerlo
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @DeleteMapping("/deleteChecking/{checkingId}")
     public ResponseEntity<?> deleteChecking(@PathVariable("checkingId") int checkingId, @RequestBody AccountHolder accountHolder){
 
         return checkingService.deleteChecking(checkingId,accountHolder);
     }
 
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @PatchMapping("/updateChecking/{checkingId}")
-    public ResponseEntity<?> udateChecking(@PathVariable("checkingId") int checkingId, @RequestBody FactoryAccountDTO factoryAccountDTOSecundaryOwner){
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/updateCheckingBalance/{checkingId}")
+    public ResponseEntity<?> udateChecking(@PathVariable("checkingId") int checkingId, @RequestBody FactoryAccountDTO factoryAccountDTOBalance){
         if (!checkingService.existsByAccountHolderId(checkingId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
-        checkingService.updateChecking(checkingId, factoryAccountDTOSecundaryOwner);
+        checkingService.updateChecking(checkingId, factoryAccountDTOBalance);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
     }
 

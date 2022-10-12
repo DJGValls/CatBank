@@ -71,13 +71,13 @@ public class StudentCheckingController {
     }
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @PatchMapping("/updateStudentChecking/{studentCheckingId}")
+    @PatchMapping("/updateStudentCheckingBalance/{studentCheckingId}")
     public ResponseEntity<?> udateChecking(@PathVariable("studentCheckingId") int studentCheckingId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!studentCheckingService.existsByAccountHolderId(studentCheckingId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         studentCheckingService.updateStudentChecking(studentCheckingId, factoryAccountDTO);
-        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("La cuenta ha sido actualizada"), HttpStatus.OK);
     }
 
 }

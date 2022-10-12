@@ -82,7 +82,7 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
     public StudentChecking studentCheckingFactory(FactoryAccountDTO factoryAccountDTO) {
         StudentChecking checking1 = new StudentChecking(factoryAccountDTO.getPrimaryOwner(),
                 factoryAccountDTO.getSecundaryOwner(),
-                new Money(new BigDecimal(factoryAccountDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
+                new Money(new BigDecimal(String.valueOf(factoryAccountDTO.getBalance().getAmount()), new MathContext(6, RoundingMode.HALF_EVEN)),
                         Currency.getInstance(factoryAccountDTO.getBalance().getCurrencyCode())),
                 factoryAccountDTO.getSecretKey(),
                 factoryAccountDTO.getStatus(),
@@ -147,7 +147,7 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
     @Override
     public StudentChecking updateStudentChecking(int studentCheckingId, FactoryAccountDTO factoryAccountDTO) {
         StudentChecking storedChecking = studentCheckingRepository.findById(studentCheckingId).get();
-        storedChecking.setSecundaryOwner(factoryAccountDTO.getSecundaryOwner());
+        storedChecking.getBalance().increaseAmount(factoryAccountDTO.getBalance().getAmount());
         return save(storedChecking);
     }
     @Override

@@ -79,7 +79,7 @@ public class SavingsServiceImp implements SavingsService{
     public Savings savingsFactory(FactoryAccountDTO factoryAccountDTO) {
         Savings StoredSaving = new Savings(factoryAccountDTO.getPrimaryOwner(),
                 factoryAccountDTO.getSecundaryOwner(),
-                new Money(new BigDecimal(factoryAccountDTO.getBalance().getAmount(), new MathContext(6, RoundingMode.HALF_EVEN)),
+                new Money(new BigDecimal(String.valueOf(factoryAccountDTO.getBalance().getAmount()), new MathContext(6, RoundingMode.HALF_EVEN)),
                         Currency.getInstance(factoryAccountDTO.getBalance().getCurrencyCode())),
                 factoryAccountDTO.getSecretKey(),
                 factoryAccountDTO.getStatus(),
@@ -151,7 +151,7 @@ public class SavingsServiceImp implements SavingsService{
     @Override
     public Savings updateSavings(int savingsId, FactoryAccountDTO factoryAccountDTO) {
         Savings storedSaving = savingsRepository.findById(savingsId).get();
-        storedSaving.setSecundaryOwner(factoryAccountDTO.getSecundaryOwner());
+        storedSaving.getBalance().increaseAmount(factoryAccountDTO.getBalance().getAmount());
         return save(storedSaving);
     }
 
