@@ -1,12 +1,18 @@
 package CatBank.Model.User;
 
+import CatBank.Model.Checking;
+import CatBank.Model.CreditCard;
+import CatBank.Model.Savings;
+import CatBank.Model.StudentChecking;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "accountHolder")
@@ -15,25 +21,31 @@ public class AccountHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int accountHolderId;
-
     @NotBlank
     private String userName;
-
     @NotBlank
     private String password;
-
     @NotNull
     @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "date_of_birth", updatable = false, nullable = false)
-    //@Temporal(TemporalType.DATE)
     private LocalDate dateOfBirth;
-
     @Embedded
     @Nullable
     private AccountHolderAddress address;
-
     @Nullable
     private String email;
+    @OneToMany(mappedBy = "checkingId")
+    @JsonIgnore
+    private List<Checking> checkingList;
+    @OneToMany(mappedBy = "studentCheckingId")
+    @JsonIgnore
+    private List<StudentChecking> studentCheckingsList;
+    @OneToMany(mappedBy = "savingsId")
+    @JsonIgnore
+    private List<Savings> savingsList;
+    @OneToMany(mappedBy = "creditCardId")
+    @JsonIgnore
+    private List<CreditCard> creditCardList;
 
 
 
@@ -103,14 +115,35 @@ public class AccountHolder {
         this.email = email;
     }
 
-
-/*    public Set<String> getRoles() {
-        return roles;
+    public List<Checking> getCheckingList() {
+        return checkingList;
     }
 
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
+    public void setCheckingList(List<Checking> checkingList) {
+        this.checkingList = checkingList;
     }
 
- */
+    public List<Savings> getSavingsList() {
+        return savingsList;
+    }
+
+    public void setSavingsList(List<Savings> savingsList) {
+        this.savingsList = savingsList;
+    }
+
+    public List<CreditCard> getCreditCardList() {
+        return creditCardList;
+    }
+
+    public void setCreditCardList(List<CreditCard> creditCardList) {
+        this.creditCardList = creditCardList;
+    }
+
+    public List<StudentChecking> getStudentCheckingsList() {
+        return studentCheckingsList;
+    }
+
+    public void setStudentCheckingsList(List<StudentChecking> studentCheckingsList) {
+        this.studentCheckingsList = studentCheckingsList;
+    }
 }

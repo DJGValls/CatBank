@@ -3,13 +3,14 @@ package CatBank.Model;
 import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
+import CatBank.Model.User.ThirdParty;
 import CatBank.Utils.Money;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "studentChecking")
@@ -18,7 +19,7 @@ public class StudentChecking extends AbstractAccount{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int StudentCheckingId;
+    private int studentCheckingId;
 
     @NotNull
     private Integer secretKey;
@@ -30,9 +31,15 @@ public class StudentChecking extends AbstractAccount{
     @NotNull
     private LocalDate creationDate;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "AccountHolder")
     private AccountHolder accountHolder;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "ThirdParty")
+    private ThirdParty thirdParty;
+
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -49,11 +56,12 @@ public class StudentChecking extends AbstractAccount{
         this.status = status;
         this.creationDate = LocalDate.now();
         this.accountHolder = accountHolder;
+        this.thirdParty = null;
         this.accountType = AccountType.STUDENTCHECKING;
     }
 
     public int getStudentCheckingId() {
-        return StudentCheckingId;
+        return studentCheckingId;
     }
 
     public Integer getSecretKey() {
@@ -94,5 +102,13 @@ public class StudentChecking extends AbstractAccount{
 
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public ThirdParty getThirdParty() {
+        return thirdParty;
+    }
+
+    public void setThirdParty(ThirdParty thirdParty) {
+        this.thirdParty = thirdParty;
     }
 }

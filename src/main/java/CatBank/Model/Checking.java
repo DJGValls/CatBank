@@ -3,6 +3,7 @@ package CatBank.Model;
 import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
+import CatBank.Model.User.ThirdParty;
 import CatBank.Utils.Money;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -49,9 +50,14 @@ public class Checking extends AbstractAccount{
             @AttributeOverride( name = "amount", column = @Column(name = "monthlyMaintenanceFee"))})
     private Money monthlyMaintenanceFee;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "AccountHolder")
     private AccountHolder accountHolder;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "ThirdParty")
+    private ThirdParty thirdParty;
 
     private LocalDate lastMaintenanceFee;
 
@@ -72,6 +78,7 @@ public class Checking extends AbstractAccount{
         this.creationDate = LocalDate.now();
         this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.accountHolder = accountHolder;
+        //this.thirdParty = thirdParty;
         this.lastMaintenanceFee = LocalDate.now();
         this.accountType = AccountType.CHECKING;
     }
@@ -141,5 +148,13 @@ public class Checking extends AbstractAccount{
 
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public ThirdParty getThirdParty() {
+        return thirdParty;
+    }
+
+    public void setThirdParty(ThirdParty thirdParty) {
+        this.thirdParty = thirdParty;
     }
 }
