@@ -2,6 +2,7 @@ package CatBank.Service;
 
 import CatBank.Model.Checking;
 import CatBank.Model.DTO.FactoryAccountDTO;
+import CatBank.Model.DTO.ThirdPartyFactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.User.AccountHolder;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,8 @@ public interface CheckingService {
 
     ResponseEntity<?> createChecking(FactoryAccountDTO factoryAccountDTO);
 
-
+    ResponseEntity<?> createCheckingThirdParty(ThirdPartyFactoryAccountDTO thirdPartyFactoryAccountDTO);
+    Checking checkingFactoryThirdParty(ThirdPartyFactoryAccountDTO thirdPartyFactoryAccountDTO);
 
 
 

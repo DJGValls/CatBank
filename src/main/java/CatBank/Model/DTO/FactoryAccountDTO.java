@@ -2,12 +2,12 @@ package CatBank.Model.DTO;
 
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
+import CatBank.Model.User.ThirdParty;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 
 public class FactoryAccountDTO {
-
 
     @NotNull
     private String primaryOwner;
@@ -21,7 +21,6 @@ public class FactoryAccountDTO {
     private Status status;
     @NotNull
     private AccountHolder accountHolder;
-
 
     public FactoryAccountDTO() {
     }
@@ -73,4 +72,5 @@ public class FactoryAccountDTO {
     public void setAccountHolder(AccountHolder accountHolder) {
         this.accountHolder = accountHolder;
     }
+
 }

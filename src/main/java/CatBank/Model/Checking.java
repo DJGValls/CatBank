@@ -70,6 +70,7 @@ public class Checking extends AbstractAccount{
         super();
     }
 
+    //AccountHolder Constructor
     public Checking(String primaryOwner, String secundaryOwner, Money balance, Integer secretKey, Status status, AccountHolder accountHolder) {
         super(primaryOwner, secundaryOwner, balance);
         this.secretKey = secretKey;
@@ -78,10 +79,23 @@ public class Checking extends AbstractAccount{
         this.creationDate = LocalDate.now();
         this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.accountHolder = accountHolder;
-        //this.thirdParty = thirdParty;
         this.lastMaintenanceFee = LocalDate.now();
         this.accountType = AccountType.CHECKING;
     }
+
+    //ThirdParty Constructor
+    public Checking(String primaryOwner, String secundaryOwner, Money balance, Integer secretKey, ThirdParty thirdParty) {
+        super(primaryOwner, secundaryOwner, balance);
+        this.secretKey = secretKey;
+        this.minBalance = new Money(new BigDecimal(250));
+        this.status = Status.ACTIVE;
+        this.creationDate = LocalDate.now();
+        this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
+        this.thirdParty = thirdParty;
+        this.lastMaintenanceFee = LocalDate.now();
+        this.accountType = AccountType.CHECKING;
+    }
+
     public int getCheckingId() {
         return checkingId;
     }

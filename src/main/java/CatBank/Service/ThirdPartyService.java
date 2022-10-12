@@ -19,6 +19,8 @@ public interface ThirdPartyService {
 
     boolean existsByUserName(String userName);
 
+    boolean existsByThirdPartyId(Integer thirdPartyId);
+
     ThirdParty thirdPartyFactory(ThirdParty thirdParty);
 
     ThirdParty findByThirdPartyUserName(String userName);

@@ -36,10 +36,6 @@ public class StudentChecking extends AbstractAccount{
     @JoinColumn(name = "AccountHolder")
     private AccountHolder accountHolder;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "ThirdParty")
-    private ThirdParty thirdParty;
-
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -49,14 +45,13 @@ public class StudentChecking extends AbstractAccount{
     public StudentChecking() {
 
     }
-
+    //AccountHolder constructor
     public StudentChecking(String primaryOwner, String secundaryOwner, Money balance, Integer secretKey, Status status, AccountHolder accountHolder) {
         super(primaryOwner, secundaryOwner, balance);
         this.secretKey = secretKey;
         this.status = status;
         this.creationDate = LocalDate.now();
         this.accountHolder = accountHolder;
-        this.thirdParty = null;
         this.accountType = AccountType.STUDENTCHECKING;
     }
 
@@ -104,11 +99,4 @@ public class StudentChecking extends AbstractAccount{
         this.accountType = accountType;
     }
 
-    public ThirdParty getThirdParty() {
-        return thirdParty;
-    }
-
-    public void setThirdParty(ThirdParty thirdParty) {
-        this.thirdParty = thirdParty;
-    }
 }

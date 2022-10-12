@@ -2,6 +2,7 @@ package CatBank.Controller;
 
 import CatBank.Model.Checking;
 import CatBank.Model.CreditCard;
+import CatBank.Model.DTO.ThirdPartyFactoryAccountDTO;
 import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
@@ -129,12 +130,20 @@ public class AuthController {
         return new ResponseEntity(new MensajeDTO("Usuario eliminado"), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/createChecking")//para crear una cuenta checking, solo un Admin puede hacerlo
+    @PostMapping("/accountHolder/createChecking")//para crear una cuenta checking, solo un Admin puede hacerlo
     public ResponseEntity<?> createChecking(@Valid @RequestBody FactoryAccountDTO factoryAccountDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
         }
         return checkingService.createChecking(factoryAccountDTO);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/thirdParty/createChecking")//para crear una cuenta checking, solo un Admin puede hacerlo
+    public ResponseEntity<?> createCheckingThirdParty(@Valid @RequestBody ThirdPartyFactoryAccountDTO thirdPartyFactoryAccountDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        return checkingService.createCheckingThirdParty(thirdPartyFactoryAccountDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

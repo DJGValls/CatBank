@@ -56,6 +56,10 @@ public class ThirdPartyServiceImp implements ThirdPartyService{
     }
 
     @Override
+    public boolean existsByThirdPartyId(Integer thirdPartyId){
+        return thirdPartyRepository.existsByThirdPartyId(thirdPartyId);
+    }
+    @Override
     public ThirdParty thirdPartyFactory(ThirdParty thirdParty) {
         ThirdParty thirdParty1 = new ThirdParty(thirdParty.getUserName(), passwordEncoder.encode(thirdParty.getPassword()));
         return save(thirdParty1);

@@ -1,6 +1,7 @@
 package CatBank.Model.DTO;
 
 import CatBank.Model.Enums.AccountType;
+import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -11,6 +12,8 @@ public class TransferenceDTO {
     private Integer originId;
     @NotNull
     private String originName;
+    @Nullable
+    private Integer secretKey;
     @NotNull
     private BigDecimal amount;
     @NotNull
@@ -70,5 +73,14 @@ public class TransferenceDTO {
 
     public void setDestinyAccountType(AccountType destinyAccountType) {
         this.destinyAccountType = destinyAccountType;
+    }
+
+    @Nullable
+    public Integer getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(@Nullable Integer secretKey) {
+        this.secretKey = secretKey;
     }
 }
