@@ -34,4 +34,6 @@ public interface SavingsService {
 
     ResponseEntity<?> getBalance(int savingsId);
 
+    ResponseEntity<?> getSavings(AccountHolder accountHolder);
+
 }

@@ -69,6 +69,13 @@ public class CheckingServiceImp implements CheckingService{
     public boolean existsByAccountHolderId(int accountHolderId) {
         return checkingRepository.existsById(accountHolderId);
     }
+
+    @Override
+    public boolean existsByCheckingId(int checkingId) {
+        return checkingRepository.existsByCheckingId(checkingId);
+    }
+
+
     @Override
     public ResponseEntity deleteChecking(int checkingId, AccountHolder accountHolder) {
         if (!existsByAccountHolderId(checkingId)) {
@@ -173,10 +180,6 @@ public class CheckingServiceImp implements CheckingService{
         }
        return new ResponseEntity(new MensajeDTO("el dinero ha sido transferido correctamente, su saldo actual es de " + originAccount.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
     }
-    @Override
-    public String findByAccountHolderUserName(String userName) {
-        return checkingRepository.findByAccountHolderUserName(userName);
-    }
 
     @Override
     public Checking updateChecking(int checkingId, FactoryAccountDTO factoryAccountDTOBalance) {
@@ -239,6 +242,23 @@ public class CheckingServiceImp implements CheckingService{
                 thirdPartyFactoryAccountDTO.getSecretKey(),
                 thirdPartyFactoryAccountDTO.getThirdParty());
         return save(checking1);
+    }
+    @Override
+    public ResponseEntity<?> getChecking (AccountHolder accountHolder) {
+
+        if (!accountHolderService.existsByAccountHolderId(accountHolder.getAccountHolderId())) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        if (!accountHolderService.existsByUserName(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("El usuario no existe"), HttpStatus.NOT_FOUND);
+        }
+        if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getUserName().equals(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece"), HttpStatus.BAD_REQUEST);
+        }
+        if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getPassword().equals(accountHolder.getPassword())){
+            return new ResponseEntity(new MensajeDTO("Password erroneo"), HttpStatus.BAD_REQUEST);
+
+        } return new ResponseEntity(checkingRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
     }
 
 }

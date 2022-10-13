@@ -18,17 +18,20 @@ public interface AccountHolderService {
 
     Optional<AccountHolder> findByEmail(String email);
 
+    Optional <AccountHolder> findByPassword(String password);
+
     boolean existByEmail(String email);
 
     boolean existsByAccountHolderId(Integer accountHolderId);
 
     boolean existsByUserName(String userName);
 
+    boolean existsByPassword(String password);
+
     boolean existsByDateOfBirthIsBetween(Date dateOfBirth, Calendar instanceDate);
 
     AccountHolder accountHolderFactory(AccountHolder accountHolder);
 
-    AccountHolder findByAccountHolderUserName(String userName);
 
     ResponseEntity<?> createAccountHolder(AccountHolder accountHolder);
 

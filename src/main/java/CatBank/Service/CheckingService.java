@@ -20,6 +20,9 @@ public interface CheckingService {
 
     boolean existsByAccountHolderId(int accountHolderId);
 
+    boolean existsByCheckingId(int checkingId);
+
+
     ResponseEntity deleteChecking(int checkingId, AccountHolder accountHolder);
 
     Checking checkingFactory(FactoryAccountDTO factoryAccountDTO);
@@ -30,8 +33,7 @@ public interface CheckingService {
 
     Object checkingTransferMoney(TransferenceDTO transferenceDTO);
 
-    String findByAccountHolderUserName(String userName);
-
+    ResponseEntity<?> getChecking(AccountHolder accountHolder);
     Checking updateChecking(int checkingId, FactoryAccountDTO factoryAccountDTO);
 
     ResponseEntity<?> createChecking(FactoryAccountDTO factoryAccountDTO);

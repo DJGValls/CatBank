@@ -81,6 +81,12 @@ public class CreditCardController {
         creditCardService.updateCreditCard(creditCardId, factoryAccountDTO);
         return new ResponseEntity(new MensajeDTO("La cuenta ha sido actualizada"), HttpStatus.OK);
     }
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PostMapping ("/creditCardInfo")
+    public ResponseEntity<?> getCreditCard (@RequestBody AccountHolder accountHolderId){
+
+        return creditCardService.getCreditCard(accountHolderId);
+    }
 
 }
 

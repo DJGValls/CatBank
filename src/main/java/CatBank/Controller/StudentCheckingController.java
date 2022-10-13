@@ -79,5 +79,11 @@ public class StudentCheckingController {
         studentCheckingService.updateStudentChecking(studentCheckingId, factoryAccountDTO);
         return new ResponseEntity(new MensajeDTO("La cuenta ha sido actualizada"), HttpStatus.OK);
     }
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PostMapping ("/studentCheckingInfo")
+    public ResponseEntity<?> getStudentChecking (@RequestBody AccountHolder accountHolderId){
+
+        return studentCheckingService.getStudentChecking(accountHolderId);
+    }
 
 }

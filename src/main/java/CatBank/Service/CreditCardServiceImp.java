@@ -8,10 +8,7 @@ import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
-import CatBank.Repository.CheckingRepository;
-import CatBank.Repository.CreditCardRepository;
-import CatBank.Repository.SavingsRepository;
-import CatBank.Repository.StudentCheckingRepository;
+import CatBank.Repository.*;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Utils.Money;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,8 @@ public class CreditCardServiceImp implements CreditCardService {
     SavingsRepository savingsRepository;
     @Autowired
     CreditCardRepository creditCardRepository;
+    @Autowired
+    AccountHolderRepository accountHolderRepository;
     @Override
     public CreditCard save(CreditCard creditCard) {
         return creditCardRepository.save(creditCard);
@@ -173,5 +172,22 @@ public class CreditCardServiceImp implements CreditCardService {
         if (storedCreditCard.isPresent()){
             return new ResponseEntity(new MensajeDTO("El saldo actual de su cuenta es de " + storedCreditCard.get().getBalance().getAmount() + "USD"), HttpStatus.OK);
         }return new ResponseEntity(new MensajeDTO("No existe esa cuenta"), HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    public ResponseEntity<?> getCreditCard(AccountHolder accountHolder) {
+        if (!accountHolderService.existsByAccountHolderId(accountHolder.getAccountHolderId())) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        if (!accountHolderService.existsByUserName(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("El usuario no existe"), HttpStatus.NOT_FOUND);
+        }
+        if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getUserName().equals(accountHolder.getUserName())){
+            return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece"), HttpStatus.BAD_REQUEST);
+        }
+        if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getPassword().equals(accountHolder.getPassword())){
+            return new ResponseEntity(new MensajeDTO("Password erroneo"), HttpStatus.BAD_REQUEST);
+
+        } return new ResponseEntity(creditCardRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
     }
 }

@@ -39,5 +39,7 @@ public interface CreditCardService {
 
     ResponseEntity<?> getBalance(int creditCardId);
 
+    ResponseEntity<?> getCreditCard(AccountHolder accountHolder);
+
 
 }

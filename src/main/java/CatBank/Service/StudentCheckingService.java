@@ -33,5 +33,5 @@ public interface StudentCheckingService {
 
     ResponseEntity<?> getBalance(int studentCheckingId);
 
-
+    ResponseEntity<?> getStudentChecking(AccountHolder accountHolder);
 }

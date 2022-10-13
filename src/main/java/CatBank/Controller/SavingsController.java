@@ -84,6 +84,12 @@ public class SavingsController {
         savingsService.updateSavings(savingsId, factoryAccountDTO);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
     }
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PostMapping ("/savingsInfo")
+    public ResponseEntity<?> getSavings (@RequestBody AccountHolder accountHolderId){
+
+        return savingsService.getSavings(accountHolderId);
+    }
 
 
 }

@@ -50,6 +50,11 @@ public class AccountHolderServiceImp implements AccountHolderService{
     }
 
     @Override
+    public Optional<AccountHolder> findByPassword(String password) {
+        return accountHolderRepository.findByPassword(password);
+    }
+
+    @Override
     public boolean existByEmail(String email) {
         return accountHolderRepository.existsByEmail(email);
     }
@@ -62,6 +67,11 @@ public class AccountHolderServiceImp implements AccountHolderService{
     @Override
     public boolean existsByUserName(String userName) {
         return accountHolderRepository.existsByUserName(userName);
+    }
+
+    @Override
+    public boolean existsByPassword(String password) {
+        return accountHolderRepository.existsByPassword(password);
     }
 
     @Override
@@ -79,12 +89,6 @@ public class AccountHolderServiceImp implements AccountHolderService{
         return accountHolderRepository.save(accountHolder1);
 
     }
-
-    @Override
-    public AccountHolder findByAccountHolderUserName(String userName) {
-        return accountHolderRepository.findByUserName(userName);
-    }
-
     @Override
     public ResponseEntity<?> createAccountHolder(AccountHolder accountHolder) {
         if (userService.existsByUserName(accountHolder.getUserName())) {
@@ -106,5 +110,6 @@ public class AccountHolderServiceImp implements AccountHolderService{
         accountHolderFactory(accountHolder);
         return new ResponseEntity(new MensajeDTO("Usuario creado"), HttpStatus.OK);
     }
+
 
 }

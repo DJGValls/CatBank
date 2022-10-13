@@ -81,6 +81,10 @@ public class CheckingController {
         checkingService.updateChecking(checkingId, factoryAccountDTOBalance);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
     }
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PostMapping ("/CheckingInfo")
+    public ResponseEntity<?> getChecking (@RequestBody AccountHolder accountHolderId){
 
-
+        return checkingService.getChecking(accountHolderId);
+    }
 }
