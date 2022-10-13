@@ -154,6 +154,16 @@ public class AuthController {
         }
         return savingsService.createSaving(factoryAccountDTO);
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/createCreditCard")//para crear una cuenta checking, solo un Admin puede hacerlo
+    public ResponseEntity<?> createCreditCard(@Valid @RequestBody FactoryAccountDTO factoryAccountDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        return creditCardService.createCreditCard(factoryAccountDTO);
+    }
+
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/adminList")

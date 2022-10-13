@@ -103,6 +103,10 @@ public class CreditCardServiceImp implements CreditCardService {
             if (!checkingDestinyAccount.isPresent() || !checkingDestinyAccount.get().getPrimaryOwner().equals(transferenceDTO.getDestinyName())){
                 return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
             }
+            if (transferenceDTO.getAmount().compareTo(originAccount.get().getCreditLimit().getAmount()) == 1){
+                originAccount.get().getBalance().decreaseAmount(originAccount.get().getPenaltyFee());
+                save(originAccount.get());
+            }
             originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
             checkingDestinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
             save(originAccount.get());
@@ -111,6 +115,10 @@ public class CreditCardServiceImp implements CreditCardService {
         if (transferenceDTO.getDestinyAccountType().equals(AccountType.STUDENTCHECKING)){
             if (!studentCheckingDestinyAccount.isPresent() || !studentCheckingDestinyAccount.get().getPrimaryOwner().equals(transferenceDTO.getDestinyName())){
                 return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
+            }
+            if (transferenceDTO.getAmount().compareTo(originAccount.get().getCreditLimit().getAmount()) == 1){
+                originAccount.get().getBalance().decreaseAmount(originAccount.get().getPenaltyFee());
+                save(originAccount.get());
             }
             originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
             studentCheckingDestinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
@@ -121,6 +129,10 @@ public class CreditCardServiceImp implements CreditCardService {
             if (!savingsDestinyAccount.isPresent() || !savingsDestinyAccount.get().getPrimaryOwner().equals(transferenceDTO.getDestinyName())){
                 return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
             }
+            if (transferenceDTO.getAmount().compareTo(originAccount.get().getCreditLimit().getAmount()) == 1){
+                originAccount.get().getBalance().decreaseAmount(originAccount.get().getPenaltyFee());
+                save(originAccount.get());
+            }
             originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
             savingsDestinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
             save(originAccount.get());
@@ -130,11 +142,16 @@ public class CreditCardServiceImp implements CreditCardService {
             if (!creditCardDestinyAccount.isPresent() || !creditCardDestinyAccount.get().getPrimaryOwner().equals(transferenceDTO.getDestinyName())){
                 return new ResponseEntity(new MensajeDTO("No existe esa cuenta de destino"), HttpStatus.NOT_FOUND);
             }
+            if (transferenceDTO.getAmount().compareTo(originAccount.get().getCreditLimit().getAmount()) == 1){
+                originAccount.get().getBalance().decreaseAmount(originAccount.get().getPenaltyFee());
+                save(originAccount.get());
+            }
             originAccount.get().getBalance().decreaseAmount(transferenceDTO.getAmount());
             creditCardDestinyAccount.get().getBalance().increaseAmount(transferenceDTO.getAmount());
             save(originAccount.get());
             creditCardRepository.save(creditCardDestinyAccount.get());
         }
+
         return new ResponseEntity(new MensajeDTO("el dinero ha sido transferido correctamente, su saldo actual es de " + originAccount.get().getBalance().getAmount() + " USD"), HttpStatus.OK);
     }
 

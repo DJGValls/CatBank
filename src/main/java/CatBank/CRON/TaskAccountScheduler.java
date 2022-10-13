@@ -56,7 +56,7 @@ public class TaskAccountScheduler {
         }
     }
     @Scheduled(cron = "*/15 * * * * *")
-    public void scheduledTaskCreditCardInterestRateAndCardLimit(){
+    public void scheduledTaskCreditCardInterestRate(){
 
         List<CreditCard> creditCardsList = new ArrayList<>(creditCardService.creditCardList());
         for(CreditCard storedCreditCard : creditCardsList) {
