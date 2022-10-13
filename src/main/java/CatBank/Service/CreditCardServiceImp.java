@@ -4,6 +4,7 @@ import CatBank.Model.Checking;
 import CatBank.Model.CreditCard;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
@@ -189,5 +190,13 @@ public class CreditCardServiceImp implements CreditCardService {
             return new ResponseEntity(new MensajeDTO("Password erroneo"), HttpStatus.BAD_REQUEST);
 
         } return new ResponseEntity(creditCardRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
+    }
+
+    @Override
+    public CreditCard updateDatesCreditCard(int creditCardId, UpadteDatesDTO upadteDatesDTO) {
+        CreditCard stored = creditCardRepository.findById(creditCardId).get();
+        stored.setCreationDate(upadteDatesDTO.getCreationDate());
+        stored.setLastMaintenanceAccount(upadteDatesDTO.getLastMaintenanceAccount());
+        return save(stored);
     }
 }

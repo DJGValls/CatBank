@@ -2,6 +2,7 @@ package CatBank.Controller;
 
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.CheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
@@ -71,20 +72,28 @@ public class CheckingController {
 
         return checkingService.deleteChecking(checkingId,accountHolder);
     }
-
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PatchMapping("/updateCheckingBalance/{checkingId}")
     public ResponseEntity<?> udateChecking(@PathVariable("checkingId") int checkingId, @RequestBody FactoryAccountDTO factoryAccountDTOBalance){
-        if (!checkingService.existsByAccountHolderId(checkingId)) {
+        if (!checkingRepository.existsById(checkingId)) {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         checkingService.updateChecking(checkingId, factoryAccountDTOBalance);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/updateDates/{checkingId}")
+    public ResponseEntity<?> updateDates(@PathVariable("checkingId") int checkingId, @RequestBody UpadteDatesDTO upadteDatesDTO){
+        if (!checkingRepository.existsById(checkingId)) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        checkingService.updateDates(checkingId, upadteDatesDTO);
+        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas"), HttpStatus.OK);
+    }
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping ("/CheckingInfo")
     public ResponseEntity<?> getChecking (@RequestBody AccountHolder accountHolderId){
-
         return checkingService.getChecking(accountHolderId);
     }
 }

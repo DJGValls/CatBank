@@ -6,6 +6,7 @@ import CatBank.Model.CreditCard;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.ThirdPartyFactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
@@ -107,8 +108,8 @@ public class CheckingServiceImp implements CheckingService{
     public ResponseEntity allFeeApplycations(int checkingId) {
         Optional<Checking> checkin1 = checkingRepository.findById(checkingId);
         if(checkin1.isPresent()){
-            while(LocalDate.now().isAfter(checkin1.get().getLastMaintenanceFee().plusMonths(1))){
-                checkin1.get().setLastMaintenanceFee(checkin1.get().getLastMaintenanceFee().plusMonths(1));
+            while(LocalDate.now().isAfter(checkin1.get().getLastMaintenanceAccount().plusMonths(1))){
+                checkin1.get().setLastMaintenanceAccount(checkin1.get().getLastMaintenanceAccount().plusMonths(1));
                 checkin1.get().setBalance(new Money(checkin1.get().getBalance().decreaseAmount(checkin1.get().getMonthlyMaintenanceFee().getAmount())));
                 penaltyFeeApply(checkingId);
                 save(checkin1.get());
@@ -187,6 +188,13 @@ public class CheckingServiceImp implements CheckingService{
         storedChecking.getBalance().increaseAmount(factoryAccountDTOBalance.getBalance().getAmount());
         return save(storedChecking);
     }
+    @Override
+    public Checking updateDates(int checkingId, UpadteDatesDTO upadteDatesDTO) {
+        Checking stored = checkingRepository.findById(checkingId).get();
+        stored.setCreationDate(upadteDatesDTO.getCreationDate());
+        stored.setLastMaintenanceAccount(upadteDatesDTO.getLastMaintenanceAccount());
+        return save(stored);
+    }
 
     @Override
     public ResponseEntity<?> createChecking(FactoryAccountDTO factoryAccountDTO) {
@@ -243,6 +251,7 @@ public class CheckingServiceImp implements CheckingService{
                 thirdPartyFactoryAccountDTO.getThirdParty());
         return save(checking1);
     }
+
     @Override
     public ResponseEntity<?> getChecking (AccountHolder accountHolder) {
 

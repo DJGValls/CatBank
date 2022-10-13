@@ -3,6 +3,7 @@ package CatBank.Controller;
 
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.CheckingRepository;
 import CatBank.Repository.CreditCardRepository;
@@ -50,6 +51,8 @@ public class CreditCardController {
     CreditCardService creditCardService;
     @Autowired
     SavingsService savingsService;
+    @Autowired
+    CreditCardRepository creditCardRepository;
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @GetMapping("/balance/{creditCardId}")
@@ -72,7 +75,7 @@ public class CreditCardController {
         return creditCardService.deleteCreditCard(creditCardId,accountHolder);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PatchMapping("/updateCreditCardBalance/{creditCardId}")
     public ResponseEntity<?> udateCreditCard(@PathVariable("creditCardId") int creditCardId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!creditCardService.existsByAccountHolderId(creditCardId)) {
@@ -87,6 +90,14 @@ public class CreditCardController {
 
         return creditCardService.getCreditCard(accountHolderId);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/updateDates/{creditCardId}")
+    public ResponseEntity<?> updateDates(@PathVariable("creditCardId") int creditCardId, @RequestBody UpadteDatesDTO upadteDatesDTO){
+        if (!creditCardRepository.existsById(creditCardId)) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        creditCardService.updateDatesCreditCard(creditCardId, upadteDatesDTO);
+        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas"), HttpStatus.OK);
+    }
 }
 

@@ -4,14 +4,11 @@ import CatBank.Model.Checking;
 import CatBank.Model.CreditCard;
 import CatBank.Model.Savings;
 import CatBank.Repository.CheckingRepository;
-import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Service.CheckingService;
 import CatBank.Service.CreditCardService;
 import CatBank.Service.SavingsService;
 import CatBank.Utils.Money;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -36,8 +33,8 @@ public class TaskAccountScheduler {
 
         List<Checking> checkingsList = new ArrayList<>(checkingService.checkingsList());
         for(Checking checking1 : checkingsList) {
-            while(LocalDate.now().isAfter(checking1.getLastMaintenanceFee().plusMonths(1))){
-                checking1.setLastMaintenanceFee(checking1.getLastMaintenanceFee().plusMonths(1));
+            while(LocalDate.now().isAfter(checking1.getLastMaintenanceAccount().plusMonths(1))){
+                checking1.setLastMaintenanceAccount(checking1.getLastMaintenanceAccount().plusMonths(1));
                 checking1.setBalance(new Money(checking1.getBalance().decreaseAmount(checking1.getMonthlyMaintenanceFee().getAmount())));
                 checkingService.penaltyFeeApply(checking1.getCheckingId());
                 checkingRepository.save(checking1);

@@ -59,7 +59,7 @@ public class Checking extends AbstractAccount{
     @JoinColumn(name = "ThirdParty")
     private ThirdParty thirdParty;
 
-    private LocalDate lastMaintenanceFee;
+    private LocalDate lastMaintenanceAccount;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -79,7 +79,7 @@ public class Checking extends AbstractAccount{
         this.creationDate = LocalDate.now();
         this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.accountHolder = accountHolder;
-        this.lastMaintenanceFee = LocalDate.now();
+        this.lastMaintenanceAccount = LocalDate.now();
         this.accountType = AccountType.CHECKING;
     }
 
@@ -92,7 +92,7 @@ public class Checking extends AbstractAccount{
         this.creationDate = LocalDate.now();
         this.monthlyMaintenanceFee = new Money(new BigDecimal(12));
         this.thirdParty = thirdParty;
-        this.lastMaintenanceFee = LocalDate.now();
+        this.lastMaintenanceAccount = LocalDate.now();
         this.accountType = AccountType.CHECKING;
     }
 
@@ -148,12 +148,12 @@ public class Checking extends AbstractAccount{
         this.accountHolder = accountHolder;
     }
 
-    public LocalDate getLastMaintenanceFee() {
-        return lastMaintenanceFee;
+    public LocalDate getLastMaintenanceAccount() {
+        return lastMaintenanceAccount;
     }
 
-    public void setLastMaintenanceFee(LocalDate lastMaintenanceFee) {
-        this.lastMaintenanceFee = lastMaintenanceFee;
+    public void setLastMaintenanceAccount(LocalDate lastMaintenanceFee) {
+        this.lastMaintenanceAccount = lastMaintenanceFee;
     }
 
     public AccountType getAccountType() {

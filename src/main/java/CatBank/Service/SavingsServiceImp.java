@@ -4,6 +4,7 @@ import CatBank.Model.Checking;
 import CatBank.Model.CreditCard;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
@@ -39,6 +40,7 @@ public class SavingsServiceImp implements SavingsService{
     CreditCardRepository creditCardRepository;
     @Autowired
     AccountHolderRepository accountHolderRepository;
+
     @Override
     public Savings save(Savings savings) {
         return savingsRepository.save(savings);
@@ -194,5 +196,13 @@ public class SavingsServiceImp implements SavingsService{
             return new ResponseEntity(new MensajeDTO("Password erroneo"), HttpStatus.BAD_REQUEST);
 
         } return new ResponseEntity(checkingRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
+    }
+
+    @Override
+    public Savings updateDates(int savingsId, UpadteDatesDTO upadteDatesDTO) {
+        Savings stored = savingsRepository.findById(savingsId).get();
+        stored.setCreationDate(upadteDatesDTO.getCreationDate());
+        stored.setLastMaintenanceAccount(upadteDatesDTO.getLastMaintenanceAccount());
+        return save(stored);
     }
 }

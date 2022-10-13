@@ -1,8 +1,10 @@
 package CatBank.Service;
 
+import CatBank.Model.Checking;
 import CatBank.Model.CreditCard;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.Savings;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.CreditCardRepository;
@@ -18,28 +20,18 @@ import java.util.List;
 public interface CreditCardService {
 
     CreditCard save(CreditCard creditCard);
-
     List<CreditCard> creditCardList();
 
     boolean existsByPrimaryOwner(String primaryOwner);
-
     boolean existsByAccountHolderId(int accountHolderId);
-
     ResponseEntity deleteCreditCard(int creditCardId, AccountHolder accountHolder);
-
     CreditCard creditCardFactory(FactoryAccountDTO factoryAccountDTO);
-
     Object creditCardTransferMoney(TransferenceDTO transferenceDTO);
-
     String findByAccountHolderUserName(String userName);
-
     CreditCard updateCreditCard(int creditCard, FactoryAccountDTO factoryAccountDTO);
-
     ResponseEntity<?> createCreditCard(FactoryAccountDTO factoryAccountDTO);
-
     ResponseEntity<?> getBalance(int creditCardId);
-
     ResponseEntity<?> getCreditCard(AccountHolder accountHolder);
-
+    CreditCard updateDatesCreditCard(int creditCardId, UpadteDatesDTO upadteDatesDTO);
 
 }

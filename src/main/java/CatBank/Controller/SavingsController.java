@@ -2,8 +2,10 @@ package CatBank.Controller;
 
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Repository.CheckingRepository;
+import CatBank.Repository.SavingsRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Service.RoleService;
@@ -29,30 +31,24 @@ public class SavingsController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     UserService userService;
-
     @Autowired
     RoleService roleService;
-
     @Autowired
     StudentCheckingService studentCheckingService;
-
     @Autowired
     JwtProvider jwtProvider;
-
     @Autowired
     CheckingRepository checkingRepository;
-
     @Autowired
     AccountHolderService accountHolderService;
-
     @Autowired
     SavingsService savingsService;
+    @Autowired
+    SavingsRepository savingsRepository;
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @GetMapping("/balance/{savingsId}")
@@ -75,7 +71,7 @@ public class SavingsController {
         return savingsService.deleteSavings(savingsId,accountHolder);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PatchMapping("/updateSavingsBalance/{savingsId}")
     public ResponseEntity<?> udateSavings(@PathVariable("savingsId") int savingsId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!savingsService.existsByAccountHolderId(savingsId)) {
@@ -89,6 +85,15 @@ public class SavingsController {
     public ResponseEntity<?> getSavings (@RequestBody AccountHolder accountHolderId){
 
         return savingsService.getSavings(accountHolderId);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/updateDates/{savingsId}")
+    public ResponseEntity<?> updateDates(@PathVariable("savingsId") int savingsId, @RequestBody UpadteDatesDTO upadteDatesDTO){
+        if (!savingsRepository.existsById(savingsId)) {
+            return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
+        }
+        savingsService.updateDates(savingsId, upadteDatesDTO);
+        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas"), HttpStatus.OK);
     }
 
 
