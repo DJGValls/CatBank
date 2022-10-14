@@ -2,6 +2,7 @@ package CatBank.Controller;
 
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Service.StudentCheckingService;
@@ -13,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/studentChecking")
@@ -56,6 +58,11 @@ public class StudentCheckingController {
     public ResponseEntity<?> getStudentChecking (@RequestBody AccountHolder accountHolderId){
 
         return studentCheckingService.getStudentChecking(accountHolderId);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/studentCheckingList")
+    public List<StudentChecking> studentCheckingsList(){
+        return studentCheckingService.studentCheckingsList();
     }
 
 }

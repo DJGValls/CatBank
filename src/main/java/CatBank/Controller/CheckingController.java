@@ -1,5 +1,6 @@
 package CatBank.Controller;
 
+import CatBank.Model.Checking;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.ThirdPartyFactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/checking")
@@ -43,12 +45,6 @@ public class CheckingController {
         return checkingService.createCheckingThirdParty(thirdPartyFactoryAccountDTO);
     }
 
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
-    @GetMapping("/balance/{checkingId}")
-    public ResponseEntity getBalance(@PathVariable(value = "checkingId") int checkingId){
-        return checkingService.allFeeApplycations(checkingId);
-    }
-
     @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object transferMoneyChecking(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
@@ -72,7 +68,6 @@ public class CheckingController {
         checkingService.updateChecking(checkingId, factoryAccountDTOBalance);
         return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/updateDates/{checkingId}")
     public ResponseEntity<?> updateDates(@PathVariable("checkingId") int checkingId, @RequestBody UpadteDatesDTO upadteDatesDTO){
@@ -86,5 +81,10 @@ public class CheckingController {
     @PostMapping ("/CheckingInfo")
     public ResponseEntity<?> getChecking (@RequestBody AccountHolder accountHolderId){
         return checkingService.getChecking(accountHolderId);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/checkingList")
+    public List<Checking> checkingsList(){
+        return checkingService.checkingsList();
     }
 }

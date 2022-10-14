@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -62,9 +63,10 @@ public class AuthController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/newUserThirdParty")//para crear un user thirdParty, solo un admin con su token puede hacerlo
-    public ResponseEntity<?> newUserThirdParty(@Valid @RequestBody ThirdParty thirdParty, BindingResult bindingResult) {
+    public Optional newUserThirdParty(@Valid @RequestBody ThirdParty thirdParty, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+            new ResponseEntity(new MensajeDTO("No existe ese usuario"), HttpStatus.NOT_FOUND);
+            return null;
         }return thirdPartyService.createThirdParty(thirdParty);
     }
     @PreAuthorize("hasRole('ADMIN')")//para borrar un user admin, thirdparty o accountholder. Solo un admin puede hacerlo
@@ -97,7 +99,7 @@ public class AuthController {
         return userService.listAdmins();
     }
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/userList")
+    @GetMapping("/userThirdPartyList")
     public List<User> listUsers(){
         return userService.listUsers();
     }
@@ -106,24 +108,5 @@ public class AuthController {
     public List<AccountHolder> accountHoldersList(){
         return accountHolderService.accountHoldersList();
     }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/checkingList")
-    public List<Checking> checkingsList(){
-        return checkingService.checkingsList();
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/studentCheckingList")
-    public List<StudentChecking> studentCheckingsList(){
-        return studentCheckingService.studentCheckingsList();
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/savingsList")
-    public List<Savings> savingsList(){
-        return savingsService.savingsList();
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/creditCardsList")
-    public List<CreditCard> creditCardsList(){
-        return creditCardService.creditCardList();
-    }
+
 }

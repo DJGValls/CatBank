@@ -1,6 +1,7 @@
 package CatBank.Controller;
 
 
+import CatBank.Model.CreditCard;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.DTO.UpadteDatesDTO;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/creditCard")
@@ -77,6 +79,11 @@ public class CreditCardController {
         }
         creditCardService.updateDatesCreditCard(creditCardId, upadteDatesDTO);
         return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas"), HttpStatus.OK);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/creditCardsList")
+    public List<CreditCard> creditCardsList(){
+        return creditCardService.creditCardList();
     }
 }
 

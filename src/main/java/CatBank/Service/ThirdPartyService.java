@@ -1,8 +1,7 @@
 package CatBank.Service;
 
-import CatBank.Model.User.AccountHolder;
 import CatBank.Model.User.ThirdParty;
-import org.springframework.http.ResponseEntity;
+import CatBank.Security.Model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +24,6 @@ public interface ThirdPartyService {
 
     ThirdParty findByThirdPartyUserName(String userName);
 
-    ResponseEntity<?> createThirdParty(ThirdParty thirdParty);
+    Optional createThirdParty(ThirdParty thirdParty);
 
 }

@@ -108,7 +108,7 @@ public class AccountHolderServiceImp implements AccountHolderService{
         user.setRoles(roles);
         userService.save(user);
         accountHolderFactory(accountHolder);
-        return new ResponseEntity(new MensajeDTO("Usuario creado"), HttpStatus.OK);
+        return new ResponseEntity (accountHolderRepository.findByEmail(accountHolder.getEmail()), HttpStatus.OK);
     }
 
 
