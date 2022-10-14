@@ -58,7 +58,7 @@ public class CheckingController {
         return checkingService.allFeeApplycations(checkingId);
     }
 
-    @PreAuthorize("hasRoles('ACCOUNTHOLDER', 'THRIDPARTY')")
+    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object transferMoneyChecking(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

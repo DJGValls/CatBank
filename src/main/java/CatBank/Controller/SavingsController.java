@@ -56,7 +56,7 @@ public class SavingsController {
         return savingsService.getBalance(savingsId);
     }
 
-    @PreAuthorize("hasRoles('ACCOUNTHOLDER','THIRDPARTY')")
+    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object savingsTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

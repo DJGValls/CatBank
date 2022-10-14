@@ -55,7 +55,7 @@ public class StudentCheckingController {
         return studentCheckingService.getBalance(studentCheckingId);
     }
 
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object studentCheckingTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

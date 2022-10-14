@@ -60,7 +60,7 @@ public class CreditCardController {
         return creditCardService.getBalance(creditCardId);
     }
 
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object creditCardTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

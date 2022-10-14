@@ -20,6 +20,9 @@ public class RoleService {
     public Optional<Role> getByRoleName(RoleName roleName){
         return roleRepository.findByRoleName(roleName);
     }
+    boolean existsByRoleName(RoleName roleName){
+        return roleRepository.existsByRoleName(roleName);
+    }
 
     public void save(Role role){
         roleRepository.save(role);

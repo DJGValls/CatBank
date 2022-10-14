@@ -65,6 +65,7 @@ public class AuthController {
     @Autowired
     ThirdPartyService thirdPartyService;
 
+
     @PostMapping("/login")//para obtener un token, ya sea de admin, de accountHolder o de thirdParty
     public ResponseEntity<JwtDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO, BindingResult bindingResult){
         if (bindingResult.hasErrors())
