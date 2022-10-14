@@ -7,6 +7,7 @@ import CatBank.Security.Model.Enums.RoleName;
 import CatBank.Security.Model.User;
 import CatBank.Security.Repository.RoleRepository;
 import CatBank.Security.Repository.UserRepository;
+import CatBank.Security.Service.RoleService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.parser.Authorization;
@@ -28,7 +29,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static CatBank.Security.Model.Enums.RoleName.ROLE_ACCOUNTHOLDER;
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,6 +57,8 @@ class AuthControllerTest {
     AuthenticationManager authenticationManager;
     @Autowired
     JwtProvider jwtProvider;
+    @Autowired
+    RoleService roleService;
 
 
 
@@ -61,83 +66,44 @@ class AuthControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    //private String jwt;
+    private String Value;
+    private User adminUser1;
 
     @BeforeEach
     void setUp() throws Exception {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        Role roleAdmin = new Role(RoleName.ROLE_ADMIN);
-        Role roleUser = new Role(RoleName.ROLE_USERTHIRDPARTY);
-        Role roleUserAccountHolder = new Role(ROLE_ACCOUNTHOLDER);
-        roleRepository.saveAll(List.of(roleAdmin, roleUser, roleUserAccountHolder));
-
-        User user1 = new User("Silvester",passwordEncoder.encode("piolin"));
-        User user2 = new User("Tom",passwordEncoder.encode("jerry"));
-        User adminUser1 = new User("admin", passwordEncoder.encode("1234"));
-        User adminUser2 = new User("Garfield_admin", passwordEncoder.encode("lasaña"));
-        userRepository.saveAll(List.of(user1, user2, adminUser1, adminUser2));
-/*        String noEncodePassword = "1234";
+        adminUser1 = new User("admin", passwordEncoder.encode("1234"));
+        Set<Role> roles = new HashSet<>();
+        roles.add((roleService.getByRoleName(RoleName.ROLE_ADMIN).get()));
+        roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
+        roles.add((roleService.getByRoleName(RoleName.ROLE_ACCOUNTHOLDER).get()));
+        adminUser1.setRoles(roles);
+        userRepository.saveAll(List.of(adminUser1));
+        String noEncodePassword = "1234";
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(adminUser1.getUserName(),
                         noEncodePassword));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtProvider.generateToken(authentication);
-
-
-        String payload = "{\"userName\" : \"admin\" , \"password\":\"1234\"}";
-        MvcResult mvcResult = mockMvc.perform(post("/auth/login")
-                        .content(payload)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        token = mvcResult.getResponse().getContentAsString();
-
-   */
+        Value = "Bearer " + jwt;
     }
-
-
     @AfterEach
     void tearDown() {
-
         roleRepository.deleteAll();
         userRepository.deleteAll();
-
     }
-
     @Test
     @DisplayName("List of users")
     void listAdmins() throws Exception {
-        String userName = "admin";
-        String noEncodePassword = "1234";
-        Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName,
-                        noEncodePassword));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtProvider.generateToken(authentication);
-        String Value = "Bearer " + jwt;
-        System.out.println(Value);
 
         MvcResult mvcResult = mockMvc.perform(get("/auth/adminList").header("Authorization", Value))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        assertTrue(mvcResult.getResponse().getContentAsString().contains("Garfield_admin"));
+        assertTrue(mvcResult.getResponse().getContentAsString().contains("admin"));
         List<User> users = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<User>>() {});
-                assertEquals(2, users.size());
-    }
-
-    @Test
-    void login() {
-    }
-
-    @Test
-    void testUser() {
-    }
-
-    @Test
-    void testAdmin() {
+                assertEquals(1, users.size());
     }
 }

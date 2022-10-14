@@ -4,21 +4,13 @@ import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.User.AccountHolder;
-import CatBank.Repository.CheckingRepository;
 import CatBank.Repository.SavingsRepository;
 import CatBank.Security.DTO.MensajeDTO;
-import CatBank.Security.JasonWebToken.JwtProvider;
-import CatBank.Security.Service.RoleService;
-import CatBank.Security.Service.UserService;
-import CatBank.Service.AccountHolderService;
 import CatBank.Service.SavingsService;
-import CatBank.Service.StudentCheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,33 +21,25 @@ import javax.validation.Valid;
 @CrossOrigin
 public class SavingsController {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    UserService userService;
-    @Autowired
-    RoleService roleService;
-    @Autowired
-    StudentCheckingService studentCheckingService;
-    @Autowired
-    JwtProvider jwtProvider;
-    @Autowired
-    CheckingRepository checkingRepository;
-    @Autowired
-    AccountHolderService accountHolderService;
+
     @Autowired
     SavingsService savingsService;
     @Autowired
     SavingsRepository savingsRepository;
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/createSavings")//para crear una cuenta checking, solo un Admin puede hacerlo
+    public ResponseEntity<?> createSavings(@Valid @RequestBody FactoryAccountDTO factoryAccountDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(new MensajeDTO("Los campos introducidos son incorrectos"), HttpStatus.BAD_REQUEST);
+        }
+        return savingsService.createSaving(factoryAccountDTO);
+    }
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @GetMapping("/balance/{savingsId}")
     public ResponseEntity getBalance(@PathVariable(value = "savingsId") int savingsId){
         return savingsService.getBalance(savingsId);
     }
-
     @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object savingsTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
@@ -64,13 +48,11 @@ public class SavingsController {
         }
         return savingsService.SavingsTransferMoney(transferenceDTO);
     }
-
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")//para borrar un Checking, solo un accountholder puede hacerlo
     @DeleteMapping("/deleteSavings/{savingsId}")
     public ResponseEntity<?> deleteSavings(@PathVariable("savingsId") int savingsId, @RequestBody AccountHolder accountHolder){
         return savingsService.deleteSavings(savingsId,accountHolder);
     }
-
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PatchMapping("/updateSavingsBalance/{savingsId}")
     public ResponseEntity<?> udateSavings(@PathVariable("savingsId") int savingsId, @RequestBody FactoryAccountDTO factoryAccountDTO){
