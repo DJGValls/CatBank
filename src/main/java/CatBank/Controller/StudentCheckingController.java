@@ -31,7 +31,7 @@ public class StudentCheckingController {
     public ResponseEntity getBalance(@PathVariable(value = "studentCheckingId") int studentCheckingId){
         return studentCheckingService.getBalance(studentCheckingId);
     }
-    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object studentCheckingTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

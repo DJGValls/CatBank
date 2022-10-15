@@ -76,8 +76,6 @@ class AuthControllerTest {
             .addModule(new JavaTimeModule())
             .build();
 
-
-
     @BeforeEach
     void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -104,9 +102,10 @@ class AuthControllerTest {
         user1.setRoles(roles1);
         userRepository.saveAll(List.of(user1));
     }
+
     @AfterEach
     void tearDown() {
-        roleRepository.deleteAll();
+
         userRepository.deleteAll();
         accountHolderRepository.deleteAll();
         thirdPartyRepository.deleteAll();
@@ -170,7 +169,6 @@ class AuthControllerTest {
         assertTrue(mvcResult.getResponse().getContentAsString().contains("Filemon"));
         assertEquals(1, users.size());
     }
-
 
     @Test
     @DisplayName(("List of accountholder"))

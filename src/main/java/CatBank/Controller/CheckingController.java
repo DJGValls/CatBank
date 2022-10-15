@@ -45,7 +45,7 @@ public class CheckingController {
         return checkingService.createCheckingThirdParty(thirdPartyFactoryAccountDTO);
     }
 
-    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object transferMoneyChecking(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -66,7 +66,7 @@ public class CheckingController {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         checkingService.updateChecking(checkingId, factoryAccountDTOBalance);
-        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("Balance actualizado a " + checkingRepository.findById(checkingId).get().getBalance().getAmount() + " USD"), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/updateDates/{checkingId}")
@@ -75,7 +75,7 @@ public class CheckingController {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         checkingService.updateDates(checkingId, upadteDatesDTO);
-        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas a creation date " + checkingRepository.findById(checkingId).get().getCreationDate() + " y last maintenance date  " + checkingRepository.findById(checkingId).get().getLastMaintenanceAccount()), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping ("/CheckingInfo")

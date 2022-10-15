@@ -11,6 +11,11 @@ public class UpadteDatesDTO {
     public UpadteDatesDTO() {
     }
 
+    public UpadteDatesDTO(LocalDate creationDate, LocalDate lastMaintenanceAccount) {
+        this.creationDate = creationDate;
+        this.lastMaintenanceAccount = lastMaintenanceAccount;
+    }
+
     public LocalDate getCreationDate() {
         return creationDate;
     }

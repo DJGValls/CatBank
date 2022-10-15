@@ -23,6 +23,15 @@ public class TransferenceDTO {
     @NotNull
     private AccountType destinyAccountType;
 
+    public TransferenceDTO(Integer originId, String originName, Integer secretKey, BigDecimal amount, Integer destinyId, String destinyName, AccountType destinyAccountType) {
+        this.originId = originId;
+        this.originName = originName;
+        this.secretKey = secretKey;
+        this.amount = amount;
+        this.destinyId = destinyId;
+        this.destinyName = destinyName;
+        this.destinyAccountType = destinyAccountType;
+    }
 
     public TransferenceDTO() {
     }

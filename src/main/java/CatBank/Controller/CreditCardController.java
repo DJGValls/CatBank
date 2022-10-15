@@ -43,7 +43,7 @@ public class CreditCardController {
     public ResponseEntity getBalance(@PathVariable(value = "creditCardId") int creditCardId){
         return creditCardService.getBalance(creditCardId);
     }
-    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object creditCardTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

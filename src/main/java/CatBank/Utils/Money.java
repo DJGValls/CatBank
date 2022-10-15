@@ -7,7 +7,7 @@ import java.util.Currency;
 @Embeddable
 public class Money {
 
-    private static final Currency USD = Currency.getInstance("USD");
+    public static final Currency USD = Currency.getInstance("USD");
     private static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;
 
     private Currency currency;

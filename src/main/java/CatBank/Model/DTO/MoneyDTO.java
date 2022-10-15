@@ -7,6 +7,11 @@ public class MoneyDTO {
     private String currencyCode;
     private BigDecimal amount;
 
+    public MoneyDTO(String currencyCode, BigDecimal amount) {
+        this.currencyCode = currencyCode;
+        this.amount = amount;
+    }
+
     public String getCurrencyCode() {
         return currencyCode;
     }

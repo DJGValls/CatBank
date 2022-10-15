@@ -19,6 +19,14 @@ public class ThirdPartyFactoryAccountDTO {
     public ThirdPartyFactoryAccountDTO() {
     }
 
+    public ThirdPartyFactoryAccountDTO(String primaryOwner, @Nullable String secundaryOwner, MoneyDTO balance, Integer secretKey, ThirdParty thirdParty) {
+        this.primaryOwner = primaryOwner;
+        this.secundaryOwner = secundaryOwner;
+        this.balance = balance;
+        SecretKey = secretKey;
+        this.thirdParty = thirdParty;
+    }
+
     public String getPrimaryOwner() {
         return primaryOwner;
     }

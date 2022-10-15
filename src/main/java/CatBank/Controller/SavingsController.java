@@ -42,7 +42,7 @@ public class SavingsController {
     public ResponseEntity getBalance(@PathVariable(value = "savingsId") int savingsId){
         return savingsService.getBalance(savingsId);
     }
-    @PreAuthorize("hasRoles('ACCOUNTHOLDER','USERTHIRDPARTY')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PostMapping("/transferMoney/")
     public Object savingsTransferMoney(@Valid @RequestBody TransferenceDTO transferenceDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

@@ -3,6 +3,7 @@ package CatBank.Model.DTO;
 import CatBank.Model.Enums.Status;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Model.User.ThirdParty;
+import CatBank.Utils.Money;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
@@ -23,6 +24,19 @@ public class FactoryAccountDTO {
     private AccountHolder accountHolder;
 
     public FactoryAccountDTO() {
+    }
+
+    public FactoryAccountDTO(String primaryOwner, @Nullable String secundaryOwner, MoneyDTO balance, Integer secretKey, Status status, AccountHolder accountHolder) {
+        this.primaryOwner = primaryOwner;
+        this.secundaryOwner = secundaryOwner;
+        this.balance = balance;
+        SecretKey = secretKey;
+        this.status = status;
+        this.accountHolder = accountHolder;
+    }
+
+    public FactoryAccountDTO(MoneyDTO balance) {
+        this.balance = balance;
     }
 
     public String getPrimaryOwner() {

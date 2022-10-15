@@ -87,7 +87,6 @@ public class AccountHolderServiceImp implements AccountHolderService{
                 , accountHolder.getAddress()
                 , accountHolder.getEmail());
         return accountHolderRepository.save(accountHolder1);
-
     }
     @Override
     public ResponseEntity<?> createAccountHolder(AccountHolder accountHolder) {
@@ -110,6 +109,4 @@ public class AccountHolderServiceImp implements AccountHolderService{
         accountHolderFactory(accountHolder);
         return new ResponseEntity (accountHolderRepository.findByEmail(accountHolder.getEmail()), HttpStatus.OK);
     }
-
-
 }
