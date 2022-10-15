@@ -3,6 +3,7 @@ package CatBank.Controller;
 import CatBank.Model.User.AccountHolder;
 import CatBank.Model.User.AccountHolderAddress;
 import CatBank.Repository.AccountHolderRepository;
+import CatBank.Repository.ThirdPartyRepository;
 import CatBank.Security.JasonWebToken.JwtProvider;
 import CatBank.Security.Model.Enums.RoleName;
 import CatBank.Security.Model.Role;
@@ -61,6 +62,8 @@ class AuthControllerTest {
     @Autowired
     AccountHolderRepository accountHolderRepository;
     @Autowired
+    ThirdPartyRepository thirdPartyRepository;
+    @Autowired
     JwtProvider jwtProvider;
     @Autowired
     RoleService roleService;
@@ -93,11 +96,20 @@ class AuthControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtProvider.generateToken(authentication);
         Value = "Bearer " + jwt;
+        AccountHolder accountHolder1 = new AccountHolder("Superintendente", passwordEncoder.encode("1234"), LocalDate.of(1980,01,01), new AccountHolderAddress("13 rue del percebe"), "maginelmago@gmail.com" );
+        accountHolderRepository.save(accountHolder1);
+        User user1 = new User("Filemon", passwordEncoder.encode("1234"));
+        Set<Role> roles1 = new HashSet<>();
+        roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
+        user1.setRoles(roles1);
+        userRepository.saveAll(List.of(user1));
     }
     @AfterEach
     void tearDown() {
         roleRepository.deleteAll();
         userRepository.deleteAll();
+        accountHolderRepository.deleteAll();
+        thirdPartyRepository.deleteAll();
     }
 
     @Test
@@ -122,7 +134,7 @@ class AuthControllerTest {
     @DisplayName("create Account Holder")
     void newUserAccountHolder() throws Exception {
 
-        AccountHolder accountHolder1 = new AccountHolder("Mortadelo", passwordEncoder.encode("1234"), LocalDate.of(1980,01,01), new AccountHolderAddress("13 rue del percebe"), "maginelmago@gmail.com" );
+        AccountHolder accountHolder1 = new AccountHolder("Mortadelo", passwordEncoder.encode("1234"), LocalDate.of(1980,01,01), new AccountHolderAddress("13 rue del percebe"), "mortadelo@gmail.com" );
         String payload = objectMapper.writeValueAsString(accountHolder1);
         MvcResult mvcResult = mockMvc.perform(post("/auth/newUserAccountHolder").header("Authorization", Value)
                         .content(payload)
@@ -149,11 +161,7 @@ class AuthControllerTest {
     @Test
     @DisplayName(("List of ThirdParty"))
     void listUsers() throws Exception {
-        User user1 = new User("Filemon", passwordEncoder.encode("1234"));
-        Set<Role> roles = new HashSet<>();
-        roles.add((roleService.getByRoleName(RoleName.ROLE_USERTHIRDPARTY).get()));
-        user1.setRoles(roles);
-        userRepository.saveAll(List.of(user1));
+
         MvcResult mvcResult = mockMvc.perform(get("/auth/userThirdPartyList").header("Authorization", Value))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -167,9 +175,7 @@ class AuthControllerTest {
     @Test
     @DisplayName(("List of accountholder"))
     void accountHoldersList() throws Exception {
-        AccountHolder accountHolder1 = new AccountHolder("Superintendente", passwordEncoder.encode("1234"), LocalDate.of(1980,01,01), new AccountHolderAddress("13 rue del percebe"), "maginelmago@gmail.com" );
 
-        accountHolderRepository.save(accountHolder1);
         MvcResult mvcResult = mockMvc.perform(get("/auth/accountHolderList").header("Authorization", Value))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -178,6 +184,4 @@ class AuthControllerTest {
         assertTrue(mvcResult.getResponse().getContentAsString().contains("Superintendente"));
         assertEquals(1, users.size());
     }
-
-
 }
