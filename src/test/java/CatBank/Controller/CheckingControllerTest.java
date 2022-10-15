@@ -201,6 +201,7 @@ class CheckingControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         assertTrue(mvcResult.getResponse().getContentAsString().contains("2021-01-01"));
+        assertTrue(mvcResult.getResponse().getContentAsString().contains("2021-02-02"));
     }
 
     @Test
