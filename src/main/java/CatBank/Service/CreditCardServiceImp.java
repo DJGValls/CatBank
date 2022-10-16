@@ -181,7 +181,7 @@ public class CreditCardServiceImp implements CreditCardService {
             return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
         }
         creditCardFactory(factoryAccountDTO);
-        return new ResponseEntity<>(new MensajeDTO("La cuenta ha sido creada con éxito"), HttpStatus.CREATED);
+        return new ResponseEntity<>(creditCardRepository.findByPrimaryOwner(factoryAccountDTO.getPrimaryOwner()), HttpStatus.CREATED);
     }
 
     @Override

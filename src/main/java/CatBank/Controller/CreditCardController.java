@@ -63,7 +63,7 @@ public class CreditCardController {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         creditCardService.updateCreditCard(creditCardId, factoryAccountDTO);
-        return new ResponseEntity(new MensajeDTO("La cuenta ha sido actualizada"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("Balance actualizado a " + creditCardRepository.findById(creditCardId).get().getBalance().getAmount() + " USD"), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping ("/creditCardInfo")
@@ -78,7 +78,7 @@ public class CreditCardController {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         creditCardService.updateDatesCreditCard(creditCardId, upadteDatesDTO);
-        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas a creation date " + creditCardRepository.findById(creditCardId).get().getCreationDate() + " y last maintenance date  " + creditCardRepository.findById(creditCardId).get().getLastMaintenanceAccount()), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/creditCardsList")
