@@ -264,8 +264,8 @@ public class CheckingServiceImp implements CheckingService{
         if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getUserName().equals(accountHolder.getUserName())){
             return new ResponseEntity(new MensajeDTO("Esa cuenta no le pertenece"), HttpStatus.BAD_REQUEST);
         }
-        if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getPassword().equals(accountHolder.getPassword())){
-            return new ResponseEntity(new MensajeDTO("Password erroneo"), HttpStatus.BAD_REQUEST);
+        if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getEmail().equals(accountHolder.getEmail())){
+            return new ResponseEntity(new MensajeDTO("email erroneo"), HttpStatus.BAD_REQUEST);
 
         } return new ResponseEntity(checkingRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
     }

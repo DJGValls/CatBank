@@ -57,6 +57,11 @@ public class AccountHolder {
         this.email = email;
     }
 
+    public AccountHolder(int accountHolderId, String userName, @Nullable String email) {
+        this.accountHolderId = accountHolderId;
+        this.userName = userName;
+        this.email = email;
+    }
 
     public AccountHolder() {
 
