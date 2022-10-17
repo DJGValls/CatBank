@@ -122,6 +122,7 @@ class SavingsControllerTest {
 
     @AfterEach
     void tearDown() {
+        checkingRepository.deleteAll();
         savingsRepository.deleteAll();
         userRepository.deleteAll();
         accountHolderRepository.deleteAll();
@@ -143,7 +144,7 @@ class SavingsControllerTest {
 
     @Test
     void savingsTransferMoney() throws Exception {
-        TransferenceDTO transferenceDTO1 = new TransferenceDTO(1,"Superintendente",1234, BigDecimal.valueOf(1000), 1, "Filemon", AccountType.CHECKING);
+        TransferenceDTO transferenceDTO1 = new TransferenceDTO(savingsRepository.findByPrimaryOwner("Superintendente").get().getSavingsId(),"Superintendente",1234, BigDecimal.valueOf(1000), checkingRepository.findByPrimaryOwner("Filemon").get().getCheckingId(), "Filemon", AccountType.CHECKING);
         String payload = objectMapper.writeValueAsString(transferenceDTO1);
         MvcResult mvcResult = mockMvc.perform(post("/savings/transferMoney/").header("Authorization", Value)
                         .content(payload)
@@ -158,7 +159,7 @@ class SavingsControllerTest {
     void udateSavings() throws Exception {
         FactoryAccountDTO factoryAccountDTO = new FactoryAccountDTO(new MoneyDTO("USD", BigDecimal.valueOf(-3000)));
         String payload = objectMapper.writeValueAsString(factoryAccountDTO);
-        MvcResult mvcResult = mockMvc.perform(patch("/savings/updateSavingsBalance/1")
+        MvcResult mvcResult = mockMvc.perform(patch("/savings/updateSavingsBalance/" + savingsRepository.findByPrimaryOwner("Superintendente").get().getSavingsId())
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -184,7 +185,7 @@ class SavingsControllerTest {
     void updateDates() throws Exception {
         UpadteDatesDTO upadteDatesDTO = new UpadteDatesDTO( LocalDate.of(2021,01,01), LocalDate.of(2021,02,02));
         String payload = objectMapper.writeValueAsString(upadteDatesDTO);
-        MvcResult mvcResult = mockMvc.perform(patch("/savings/updateDates/1")
+        MvcResult mvcResult = mockMvc.perform(patch("/savings/updateDates/" + savingsRepository.findByPrimaryOwner("Superintendente").get().getSavingsId())
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

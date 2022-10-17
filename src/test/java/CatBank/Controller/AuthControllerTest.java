@@ -52,8 +52,6 @@ class AuthControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
     @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
