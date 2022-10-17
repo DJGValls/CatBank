@@ -164,7 +164,7 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
             return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
         }
         studentCheckingFactory(factoryAccountDTO);
-        return new ResponseEntity<>(new MensajeDTO("El usuario es menor de 24 años, la cuenta ha sido creada como StudentChecking \n " + studentCheckingRepository.findByPrimaryOwner(factoryAccountDTO.getPrimaryOwner())), HttpStatus.CREATED);
+        return new ResponseEntity<>(studentCheckingRepository.findByPrimaryOwner(factoryAccountDTO.getPrimaryOwner()), HttpStatus.CREATED);
     }
     @Override
     public ResponseEntity<?> getBalance(int studentCheckingId) {

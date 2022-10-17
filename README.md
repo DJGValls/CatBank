@@ -1,159 +1,26 @@
 # CatBank
 
-Requirements
 
-The system must have 4 types of accounts: StudentChecking, Checking, Savings, and CreditCard.
+Bienvenidos a CatBank, el primer banco para gatos, recuerde, si es usted perro, este no es su banco.
+Para crear una cuenta en CatBank, uno de nuestros administradores autorizados le pedirá que nos facilite sus datos de contacto instransferibles para crear un usuario con permisos. Una vez creado su usuario de cuenta AccountHolder nuestro administrador procederá a crear una cuenta para usted. Podrá elegir entre una de las siguientes cuentas, o todas si es que usted es un gato de alto pedigrí:
+# •	Cuenta Checking :
+Esta es una de nuestras cuentas más usadas, con un balance mínimo de 250 USD y con una tasa de mantenimiento de tan solo 12 USD al mes, no encontrará nada mejor en el mercado gatuno
 
-Checking
+##### _Letra pequeña, la penalización por bajar del balance mínimo será penalizado con 40 USD al mes_
 
+# •	Cuenta StudentChecking :
+Si es usted todavía un kitten menor de 24 años gatunos y desea tener una cuenta checking como cualquier otro gato adulto no se preocupe, el sistema creará para usted una cuenta a su menuda medida sin ningún tipo de restricción por mantenimiento hasta que cumpla su edad adulta después de los 24 años gatunos
+# •	Cuenta Savings : 
+¿Pensaba usted que no iba a poder guardar esos ahorros para poder comprar un ovillo gigante de lana y tendría que conformarse con ese misero cordón de zapato humano para toda la vida? En CatBank le ofrecemos la posibilidad de guardar sus ahorros en nuestra cuenta Savings.
+Con un balance mínimo de 1000 USD podrá guardar aquí sus ahorros mientras le generan un 0.1% de interés anual.
 
-Checking Accounts should have:
+##### _Letra pequeña, la penalización por bajar del balance mínimo será penalizado con 40 USD al año_
 
-A balance
-A secretKey
-A PrimaryOwner
-An optional SecondaryOwner
-A minimumBalance
-A penaltyFee
-A monthlyMaintenanceFee
-A creationDate
-A status (FROZEN, ACTIVE)
+# •	Credit Card :
+Como no podía ser de otra manera en CatBank tiene a su disposición la posibilidad de crear una CreditCard. CatBank es el único banco que le ofrece un interés mensual a su favor de 0.1% por tener dinero en su credit Card sin tener ningún tipo de restricción de mantenimiento.
 
-StudentChecking
+##### _Letra pequeña, la penalización por pasar del límite de crédito permitido (1000USD) en una transacción será penalizado con 40 USD_
 
 
-Student Checking Accounts are identical to Checking Accounts except that they do NOT have:
-
-A monthlyMaintenanceFee
-A minimumBalance
-
-Savings
-
-
-Savings are identical to Checking accounts except that they
-
-Do NOT have a monthlyMaintenanceFee
-Do have an interestRate
-
-CreditCard
-
-
-CreditCard Accounts have:
-
-A balance
-A PrimaryOwner
-An optional SecondaryOwner
-A creditLimit
-An interestRate
-A penaltyFee
-
-The system must have 3 types of Users: Admins and AccountHolders.
-
-AccountHolders
-
-
-The AccountHolders should be able to access their own accounts and only their accounts when passing the correct credentials using Basic Auth. AccountHolders have:
-
-A name
-Date of birth
-A primaryAddress (which should be a separate address class)
-An optional mailingAddress
-
-Admins
-
-
-Admins only have a name
-
-
-ThirdParty
-
-
-The ThirdParty Accounts have a hashed key and a name.
-
-
-Admins can create new accounts. When creating a new account they can create Checking, Savings, or CreditCard Accounts.
-
-Savings
-
-
-Savings accounts have a default interest rate of 0.0025
-Savings accounts may be instantiated with an interest rate other than the default, with a maximum interest rate of 0.5
-Savings accounts should have a default minimumBalance of 1000
-Savings accounts may be instantiated with a minimum balance of less than 1000 but no lower than 100
-
-CreditCards
-
-
-CreditCard accounts have a default creditLimit of 100
-CreditCards may be instantiated with a creditLimit higher than 100 but not higher than 100000
-CreditCards have a default interestRate of 0.2
-CreditCards may be instantiated with an interestRate less than 0.2 but not lower than 0.1
-
-CheckingAccounts
-
-
-When creating a new Checking account, if the primaryOwner is less than 24, a StudentChecking account should be created otherwise a regular Checking Account should be created.
-Checking accounts should have a minimumBalance of 250 and a monthlyMaintenanceFee of 12
-
-Interest and Fees should be applied appropriately
-
-PenaltyFee
-
-
-The penaltyFee for all accounts should be 40.
-If any account drops below the minimumBalance, the penaltyFee should be deducted from the balance automatically
-
-InterestRate
-
-
-Interest on savings accounts is added to the account annually at the rate of specified interestRate per year. That means that if I have 1000000 in a savings account with a 0.01 interest rate, 1% of 1 Million is added to my account after 1 year. When a savings account balance is accessed, you must determine if it has been 1 year or more since either the account was created or since interest was added to the account, and add the appropriate interest to the balance if necessary.
-
-Interest on credit cards is added to the balance monthly. If you have a 12% interest rate (0.12) then 1% interest will be added to the account monthly. When the balance of a credit card is accessed, check to determine if it has been 1 month or more since the account was created or since interested was added, and if so, add the appropriate interest to the balance.
-
-
-Account Access
-
-Admins
-
-
-Admins should be able to access the balance for any account and to modify it.
-
-AccountHolders
-
-
-AccountHolders should be able to access their own account balance
-Account holders should be able to transfer money from any of their accounts to any other account (regardless of owner). The transfer should only be processed if the account has sufficient funds. The user must provide the Primary or Secondary owner name and the id of the account that should receive the transfer.
-
-Third-Party Users
-
-
-There must be a way for third-party users to receive and send money to other accounts.
-Third-party users must be added to the database by an admin.
-In order to receive and send money, Third-Party Users must provide their hashed key in the header of the HTTP request. They also must provide the amount, the Account id and the account secret key.
-
-
-
-
-Extra features (bonus)
-Fraud Detection
-
-The application must recognize patterns that indicate fraud and Freeze the account status when potential fraud is detected.
-
-Patterns that indicate fraud include:
-
-Transactions made in 24 hours total to more than 150% of the customers highest daily total transactions in any other 24 hour period.
-More than 2 transactions occurring on a single account within a 1 second period.
-
-Technical Requirements
-Include a Java/Spring Boot backend.
-Everything should be stored in MySQL database tables.
-Include at least 1 GET, POST, PUT/PATCH, and DELETE route.
-Include authentication with Spring Security.
-Include unit and integration tests.
-Include robust error handling.
-You must use the Money class for all currency and BigDecimal for any other decimal or large number math.
-Deliverables
-A working REST API, built by you that runs on a local server.
-The URL of the GitHub repository for your app.
-A simplified class diagram representing your project structure should be added to the repo.
-Adequate and complete documentation in the README.md file.
+Una vez tenga creada su cuenta en CatBank podrá consultar su cuenta y realizar transferencias a otros usuarios o otras cuentas de las que usted disponga. Tan solo necesitará logearse en nuestra plataforma con su nombre y password y la plataforma le devolverá un token de acreditación que le permitirá realizar las tareas anteriormente descritas.
+Un cordial saludo del mejor banco para gatos, miau!
