@@ -56,7 +56,7 @@ public class CreditCardController {
     public ResponseEntity<?> deleteCreditCard(@PathVariable("creditCardId") int creditCardId, @RequestBody AccountHolder accountHolder){
         return creditCardService.deleteCreditCard(creditCardId,accountHolder);
     }
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PatchMapping("/updateCreditCardBalance/{creditCardId}")
     public ResponseEntity<?> udateCreditCard(@PathVariable("creditCardId") int creditCardId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!creditCardService.existsByAccountHolderId(creditCardId)) {

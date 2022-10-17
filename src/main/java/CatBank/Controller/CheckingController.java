@@ -59,7 +59,7 @@ public class CheckingController {
 
         return checkingService.deleteChecking(checkingId,accountHolder);
     }
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PatchMapping("/updateCheckingBalance/{checkingId}")
     public ResponseEntity<?> udateChecking(@PathVariable("checkingId") int checkingId, @RequestBody FactoryAccountDTO factoryAccountDTOBalance){
         if (!checkingRepository.existsById(checkingId)) {

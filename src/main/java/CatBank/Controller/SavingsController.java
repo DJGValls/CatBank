@@ -55,7 +55,7 @@ public class SavingsController {
     public ResponseEntity<?> deleteSavings(@PathVariable("savingsId") int savingsId, @RequestBody AccountHolder accountHolder){
         return savingsService.deleteSavings(savingsId,accountHolder);
     }
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PatchMapping("/updateSavingsBalance/{savingsId}")
     public ResponseEntity<?> udateSavings(@PathVariable("savingsId") int savingsId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!savingsService.existsByAccountHolderId(savingsId)) {

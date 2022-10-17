@@ -47,7 +47,7 @@ public class StudentCheckingController {
     public ResponseEntity<?> deleteChecking(@PathVariable("studentCheckingId") int studentCheckingId, @RequestBody AccountHolder accountHolder){
         return studentCheckingService.deleteStudentChecking(studentCheckingId,accountHolder);
     }
-    @PreAuthorize("hasRole('ACCOUNTHOLDER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ACCOUNTHOLDER','ROLE_USERTHIRDPARTY')")
     @PatchMapping("/updateStudentCheckingBalance/{studentCheckingId}")
     public ResponseEntity<?> udateChecking(@PathVariable("studentCheckingId") int studentCheckingId, @RequestBody FactoryAccountDTO factoryAccountDTO){
         if (!studentCheckingService.existsByAccountHolderId(studentCheckingId)) {
