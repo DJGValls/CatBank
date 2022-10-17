@@ -170,7 +170,7 @@ public class SavingsServiceImp implements SavingsService{
             return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
         }
         savingsFactory(factoryAccountDTO);
-        return new ResponseEntity<>(new MensajeDTO("La cuenta Savings ha sido creada con éxito"), HttpStatus.CREATED);
+        return new ResponseEntity<>(savingsRepository.findByPrimaryOwner(factoryAccountDTO.getPrimaryOwner()), HttpStatus.CREATED);
     }
 
     @Override
@@ -195,7 +195,7 @@ public class SavingsServiceImp implements SavingsService{
         if (!accountHolderRepository.findById(accountHolder.getAccountHolderId()).get().getEmail().equals(accountHolder.getEmail())){
             return new ResponseEntity(new MensajeDTO("email erroneo"), HttpStatus.BAD_REQUEST);
 
-        } return new ResponseEntity(checkingRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
+        } return new ResponseEntity(savingsRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
     }
 
     @Override

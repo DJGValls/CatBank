@@ -62,7 +62,7 @@ public class SavingsController {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         savingsService.updateSavings(savingsId, factoryAccountDTO);
-        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada, el saldo actual es de " + savingsRepository.findById(savingsId).get().getBalance().getAmount() + " USD"), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping ("/savingsInfo")
@@ -77,7 +77,7 @@ public class SavingsController {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         savingsService.updateDates(savingsId, upadteDatesDTO);
-        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("Las fechas han sido actualizadas a creation date " + savingsRepository.findById(savingsId).get().getCreationDate() + " y last maintenance date  " + savingsRepository.findById(savingsId).get().getLastMaintenanceAccount()), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
