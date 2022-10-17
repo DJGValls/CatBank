@@ -118,13 +118,14 @@ class CreditCardControllerTest {
         thirdPartyRepository.saveAll(List.of(thirdParty1, thirdParty2));
         CreditCard creditCard1 = new CreditCard("Superintendente", "Ofelia", new Money(BigDecimal.valueOf(10000), USD), accountHolder1);
         creditCardRepository.saveAll(List.of(creditCard1));
-        Checking checking1 = new Checking("Filemon", "Ofelia", new Money(BigDecimal.valueOf(10000), USD), 1234, thirdPartyRepository.findByUserName("Filemon").get());
+        Checking checking1 = new Checking("Filemon", "Ofelia", new Money(BigDecimal.valueOf(10000), USD), 1234, thirdParty1);
         checkingRepository.saveAll(List.of(checking1));
     }
 
     @AfterEach
     void tearDown() {
         creditCardRepository.deleteAll();
+        checkingRepository.deleteAll();
         userRepository.deleteAll();
         accountHolderRepository.deleteAll();
         thirdPartyRepository.deleteAll();
@@ -145,7 +146,7 @@ class CreditCardControllerTest {
 
     @Test
     void creditCardTransferMoney() throws Exception {
-        TransferenceDTO transferenceDTO1 = new TransferenceDTO(1,"Superintendente",1234, BigDecimal.valueOf(1000), 1, "Filemon", AccountType.CHECKING);
+        TransferenceDTO transferenceDTO1 = new TransferenceDTO(creditCardRepository.findByPrimaryOwner("Superintendente").get().getCreditCardId(),"Superintendente",1234, BigDecimal.valueOf(1000), checkingRepository.findByPrimaryOwner("Filemon").get().getCheckingId(), "Filemon", AccountType.CHECKING);
         String payload = objectMapper.writeValueAsString(transferenceDTO1);
         MvcResult mvcResult = mockMvc.perform(post("/creditCard/transferMoney/").header("Authorization", Value)
                         .content(payload)
@@ -160,7 +161,7 @@ class CreditCardControllerTest {
     void udateCreditCard() throws Exception {
         FactoryAccountDTO factoryAccountDTO = new FactoryAccountDTO(new MoneyDTO("USD", BigDecimal.valueOf(-3000)));
         String payload = objectMapper.writeValueAsString(factoryAccountDTO);
-        MvcResult mvcResult = mockMvc.perform(patch("/creditCard/updateCreditCardBalance/1")
+        MvcResult mvcResult = mockMvc.perform(patch("/creditCard/updateCreditCardBalance/" + creditCardRepository.findByPrimaryOwner("Superintendente").get().getCreditCardId())
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -171,7 +172,7 @@ class CreditCardControllerTest {
 
     @Test
     void getCreditCard() throws Exception {
-        AccountHolder accountHolder = new AccountHolder(1, "Superintendente", "supervicente@gmail.com");
+        AccountHolder accountHolder = new AccountHolder(accountHolderRepository.findByEmail("supervicente@gmail.com").get().getAccountHolderId(), "Superintendente", "supervicente@gmail.com");
         String payload = objectMapper.writeValueAsString(accountHolder);
         MvcResult mvcResult = mockMvc.perform(post("/creditCard/creditCardInfo")
                         .content(payload)
@@ -186,7 +187,7 @@ class CreditCardControllerTest {
     void updateDates() throws Exception {
         UpadteDatesDTO upadteDatesDTO = new UpadteDatesDTO( LocalDate.of(2021,01,01), LocalDate.of(2021,02,02));
         String payload = objectMapper.writeValueAsString(upadteDatesDTO);
-        MvcResult mvcResult = mockMvc.perform(patch("/creditCard/updateDates/1")
+        MvcResult mvcResult = mockMvc.perform(patch("/creditCard/updateDates/" + creditCardRepository.findByPrimaryOwner("Superintendente").get().getCreditCardId())
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

@@ -155,7 +155,7 @@ class CheckingControllerTest {
     @DisplayName("Transfer money from checking")
     void transferMoneyChecking() throws Exception {
 
-        TransferenceDTO transferenceDTO1 = new TransferenceDTO(1,"Superintendente",1234, BigDecimal.valueOf(1000), 2, "Filemon", AccountType.CHECKING);
+        TransferenceDTO transferenceDTO1 = new TransferenceDTO(checkingRepository.findByPrimaryOwner("Superintendente").get().getCheckingId(),"Superintendente",1234, BigDecimal.valueOf(1000), checkingRepository.findByPrimaryOwner("Filemon").get().getCheckingId(), "Filemon", AccountType.CHECKING);
         String payload = objectMapper.writeValueAsString(transferenceDTO1);
         MvcResult mvcResult = mockMvc.perform(post("/checking/transferMoney/").header("Authorization", Value)
                         .content(payload)
@@ -172,7 +172,7 @@ class CheckingControllerTest {
 
         FactoryAccountDTO factoryAccountDTO = new FactoryAccountDTO(new MoneyDTO("USD", BigDecimal.valueOf(-3000)));
         String payload = objectMapper.writeValueAsString(factoryAccountDTO);
-        MvcResult mvcResult = mockMvc.perform(patch("/checking/updateCheckingBalance/1")
+        MvcResult mvcResult = mockMvc.perform(patch("/checking/updateCheckingBalance/"+ checkingRepository.findByPrimaryOwner("Superintendente").get().getCheckingId())
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -187,7 +187,7 @@ class CheckingControllerTest {
 
         UpadteDatesDTO upadteDatesDTO = new UpadteDatesDTO( LocalDate.of(2021,01,01), LocalDate.of(2021,02,02));
         String payload = objectMapper.writeValueAsString(upadteDatesDTO);
-        MvcResult mvcResult = mockMvc.perform(patch("/checking/updateDates/1")
+        MvcResult mvcResult = mockMvc.perform(patch("/checking/updateDates/" + checkingRepository.findByPrimaryOwner("Superintendente").get().getCheckingId())
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -201,7 +201,7 @@ class CheckingControllerTest {
     @DisplayName("checking info of account holder")
     void getChecking() throws Exception {
 
-        AccountHolder accountHolder = new AccountHolder(1, "Superintendente", "supervicente@gmail.com");
+        AccountHolder accountHolder = new AccountHolder(accountHolderRepository.findByEmail("supervicente@gmail.com").get().getAccountHolderId(), "Superintendente", "supervicente@gmail.com");
         String payload = objectMapper.writeValueAsString(accountHolder);
         MvcResult mvcResult = mockMvc.perform(post("/checking/CheckingInfo")
                         .content(payload)

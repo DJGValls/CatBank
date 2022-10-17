@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -128,7 +129,7 @@ class StudentCheckingControllerTest {
 
     @Test
     void studentCheckingTransferMoney() throws Exception {
-        TransferenceDTO transferenceDTO1 = new TransferenceDTO(1,"Superintendente",1234, BigDecimal.valueOf(1000), 1, "Filemon", AccountType.CHECKING);
+        TransferenceDTO transferenceDTO1 = new TransferenceDTO(studentCheckingRepository.findByPrimaryOwner("Superintendente").get().getStudentCheckingId(),"Superintendente",1234, BigDecimal.valueOf(1000), 1, "Filemon", AccountType.CHECKING);
         String payload = objectMapper.writeValueAsString(transferenceDTO1);
         MvcResult mvcResult = mockMvc.perform(post("/studentChecking/transferMoney/").header("Authorization", Value)
                         .content(payload)
@@ -143,7 +144,7 @@ class StudentCheckingControllerTest {
     void udateChecking() throws Exception {
         FactoryAccountDTO factoryAccountDTO = new FactoryAccountDTO(new MoneyDTO("USD", BigDecimal.valueOf(-3000)));
         String payload = objectMapper.writeValueAsString(factoryAccountDTO);
-        MvcResult mvcResult = mockMvc.perform(patch("/studentChecking/updateStudentCheckingBalance/1")
+        MvcResult mvcResult = mockMvc.perform(patch("/studentChecking/updateStudentCheckingBalance/"+ studentCheckingRepository.findByPrimaryOwner("Superintendente").get().getStudentCheckingId())
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -154,7 +155,7 @@ class StudentCheckingControllerTest {
 
     @Test
     void getStudentChecking() throws Exception {
-        AccountHolder accountHolder = new AccountHolder(1, "Superintendente", "supervicente@gmail.com");
+        AccountHolder accountHolder = new AccountHolder(accountHolderRepository.findByEmail("supervicente@gmail.com").get().getAccountHolderId(), "Superintendente", "supervicente@gmail.com");
         String payload = objectMapper.writeValueAsString(accountHolder);
         MvcResult mvcResult = mockMvc.perform(post("/studentChecking/studentCheckingInfo")
                         .content(payload)
