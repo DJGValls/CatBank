@@ -4,6 +4,7 @@ import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
 import CatBank.Model.StudentChecking;
 import CatBank.Model.User.AccountHolder;
+import CatBank.Repository.StudentCheckingRepository;
 import CatBank.Security.DTO.MensajeDTO;
 import CatBank.Service.StudentCheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class StudentCheckingController {
 
     @Autowired
     StudentCheckingService studentCheckingService;
+    @Autowired
+    StudentCheckingRepository studentCheckingRepository;
 
 
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
@@ -51,7 +54,7 @@ public class StudentCheckingController {
             return new ResponseEntity(new MensajeDTO("La cuenta no está presente"), HttpStatus.NOT_FOUND);
         }
         studentCheckingService.updateStudentChecking(studentCheckingId, factoryAccountDTO);
-        return new ResponseEntity(new MensajeDTO("La cuenta ha sido actualizada"), HttpStatus.OK);
+        return new ResponseEntity(new MensajeDTO("La cuenta Checking ha sido actualizada, el saldo actual es de " + studentCheckingRepository.findById(studentCheckingId).get().getBalance().getAmount()), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ACCOUNTHOLDER')")
     @PostMapping ("/studentCheckingInfo")

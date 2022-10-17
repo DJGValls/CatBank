@@ -4,6 +4,7 @@ import CatBank.Model.Checking;
 import CatBank.Model.CreditCard;
 import CatBank.Model.DTO.FactoryAccountDTO;
 import CatBank.Model.DTO.TransferenceDTO;
+import CatBank.Model.DTO.UpadteDatesDTO;
 import CatBank.Model.Enums.AccountType;
 import CatBank.Model.Savings;
 import CatBank.Model.StudentChecking;
@@ -163,7 +164,7 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
             return new ResponseEntity<>(new MensajeDTO("El nombre del primaryOwner ha de coincidir con el user name del AccountHolder"), HttpStatus.BAD_REQUEST);
         }
         studentCheckingFactory(factoryAccountDTO);
-        return new ResponseEntity<>(new MensajeDTO("El usuario " + factoryAccountDTO.getAccountHolder().getUserName() + " es menor de 24 años, la cuenta ha sido creada como StudentChecking"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new MensajeDTO("El usuario es menor de 24 años, la cuenta ha sido creada como StudentChecking \n " + studentCheckingRepository.findByPrimaryOwner(factoryAccountDTO.getPrimaryOwner())), HttpStatus.CREATED);
     }
     @Override
     public ResponseEntity<?> getBalance(int studentCheckingId) {
@@ -189,6 +190,5 @@ public class StudentCheckingServiceImp implements StudentCheckingService{
 
         } return new ResponseEntity(studentCheckingRepository.findByPrimaryOwner(accountHolder.getUserName()), HttpStatus.OK);
     }
-
 
 }
