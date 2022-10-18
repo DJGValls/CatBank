@@ -124,8 +124,9 @@ public class CheckingServiceImp implements CheckingService{
         if(checkin1.isPresent()){
             if (checkin1.get().getBalance().getAmount().compareTo(checkin1.get().getMinBalance().getAmount())==-1){
             checkin1.get().getBalance().decreaseAmount(checkin1.get().getPenaltyFee().getAmount());
+            checkingRepository.save(checkin1.get());
             }
-        } new ResponseEntity(new MensajeDTO("No existe esa cuenta checking"), HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override

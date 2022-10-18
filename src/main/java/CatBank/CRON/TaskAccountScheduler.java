@@ -36,7 +36,10 @@ public class TaskAccountScheduler {
             while(LocalDate.now().isAfter(checking1.getLastMaintenanceAccount().plusMonths(1))){
                 checking1.setLastMaintenanceAccount(checking1.getLastMaintenanceAccount().plusMonths(1));
                 checking1.setBalance(new Money(checking1.getBalance().decreaseAmount(checking1.getMonthlyMaintenanceFee().getAmount())));
-                checkingService.penaltyFeeApply(checking1.getCheckingId());
+                if (checking1.getBalance().getAmount().compareTo(checking1.getMinBalance().getAmount())==-1){
+                    checking1.getBalance().decreaseAmount(checking1.getPenaltyFee().getAmount());
+                    checkingRepository.save(checking1);
+                }
                 checkingRepository.save(checking1);
             }
         }
