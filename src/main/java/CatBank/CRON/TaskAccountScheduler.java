@@ -54,6 +54,7 @@ public class TaskAccountScheduler {
                 storedSavings.setBalance(new Money(storedSavings.getBalance().increaseAmount(((storedSavings.getInterestRate().getAmount()).multiply(storedSavings.getBalance().getAmount()).divide(BigDecimal.valueOf(100))))));
                 if (storedSavings.getBalance().getAmount().compareTo(storedSavings.getMinBalance().getAmount()) == -1) {
                     storedSavings.getBalance().decreaseAmount(storedSavings.getPenaltyFee().getAmount());
+                    savingsService.save(storedSavings);
                 }
             }savingsService.save(storedSavings);
         }
